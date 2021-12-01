@@ -10,7 +10,7 @@ data "aws_iam_policy_document" "assume_role_policy" {
 }
 
 resource "aws_iam_role" "ecs-execution-task-role" {
-   name = "keycloak-ecs-execution-task-role"
+   name = "keycloak-${var.environment}-ecs-execution-task-role"
    assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
 
    tags = {
@@ -27,7 +27,7 @@ resource "aws_iam_role_policy_attachment" "ecs-execution-task-policy" {
 # IAM Role for RDS Enhanced Monitoring
 resource "aws_iam_role" "keycloak-db-monitoring-role" {
 
-  name = "keycloak-db-monitoring-role"
+  name = "keycloak-${var.environment}-db-monitoring-role"
   assume_role_policy = jsonencode({
          Version = "2012-10-17"
           Statement = [

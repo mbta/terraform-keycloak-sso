@@ -1,6 +1,6 @@
 resource "aws_security_group" "load-balancer-sg" {
   vpc_id = aws_vpc.keycloak-vpc.id
-  name   = "load-balancer-sg"
+  name   = "keycloak-${var.environment}-load-balancer-sg"
 
   ingress {
     from_port        = 443
@@ -25,7 +25,7 @@ resource "aws_security_group" "load-balancer-sg" {
 }
 
 resource "aws_alb" "application-load-balancer" {
-  name               = "keycloak-alb"
+  name               = "keycloak-${var.environment}-alb"
   internal           = false
   load_balancer_type = "application"
   subnets            = aws_subnet.public.*.id
@@ -47,7 +47,7 @@ resource "aws_alb" "application-load-balancer" {
 }
 
 resource "aws_lb_target_group" "target-group" {
-  name        = "keycloak-target-group"
+  name        = "keycloak-${var.environment}-target-group"
   port        = 8080
   protocol    = "HTTP"
   target_type = "ip"

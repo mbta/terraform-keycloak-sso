@@ -1,5 +1,5 @@
 resource "aws_db_subnet_group" "keycloak-database-subnet" {
-  name       = "keycloak-database-subnet"
+  name       = "keycloak-${var.environment}-database-subnet"
   subnet_ids = aws_subnet.private.*.id
 
   tags = {
@@ -10,7 +10,7 @@ resource "aws_db_subnet_group" "keycloak-database-subnet" {
 
 resource "aws_security_group" "database-sg" {
   vpc_id = aws_vpc.keycloak-vpc.id
-  name   = "database-sg"
+  name   = "keycloak-${var.environment}-database-sg"
   ingress {
     description     = "MariaDB port"
     from_port       = 3306
@@ -34,7 +34,7 @@ resource "aws_security_group" "database-sg" {
 }
 
 resource "aws_db_parameter_group" "rds-mariadb-pg" {
-  name   = "rds-mariadb-pg"
+  name   = "rds-keycloak-${var.environment}-mariadb-pg"
   family = "mariadb10.5"
 
   parameter {
@@ -54,7 +54,7 @@ resource "aws_db_parameter_group" "rds-mariadb-pg" {
 }
 
 resource "aws_db_option_group" "rds-mariadb-og" {
-  name                     = "rds-mariadb-og"
+  name                     = "rds-keycloak-${var.environment}-mariadb-og"
   option_group_description = "Terraform Option Group Maria DB"
   engine_name              = "mariadb"
   major_engine_version     = "10.5"
@@ -76,7 +76,7 @@ resource "aws_db_option_group" "rds-mariadb-og" {
 
 resource "aws_db_instance" "keycloak-database-engine" {
   name                                  = "${var.db_name}"
-  identifier                            = "keycloak-database-engine"
+  identifier                            = "keycloak-${var.environment}-database-engine"
   allocated_storage                     = 20
   max_allocated_storage                 = 100
   engine                                = "mariadb"
@@ -86,8 +86,8 @@ resource "aws_db_instance" "keycloak-database-engine" {
   multi_az                              = true
   username                              = "${var.db_username}"
   password                              = "${var.db_password}"
-  parameter_group_name                  = "rds-mariadb-pg"
-  option_group_name                     = "rds-mariadb-og"
+  parameter_group_name                  = "rds-keycloak-${var.environment}-mariadb-pg"
+  option_group_name                     = "rds-keycloak-${var.environment}-mariadb-og"
   vpc_security_group_ids                = [aws_security_group.database-sg.id]
   skip_final_snapshot                   = true
   monitoring_interval                   = 15
@@ -107,7 +107,7 @@ resource "aws_db_instance" "keycloak-database-engine" {
 }*/
 
 data "aws_db_instance" "database" {
-  db_instance_identifier = "keycloak-database-engine"
+  db_instance_identifier = "keycloak-${var.environment}-database-engine"
   
   depends_on = [aws_db_instance.keycloak-database-engine]
 }

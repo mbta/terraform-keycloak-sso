@@ -8,6 +8,11 @@ variable "ecr_keycloak_image_url" {
   description = "ECR Keycloak Image location"
 }
 
+variable "environment" {
+  type = string
+  description = "Name of environment, e.g. 'dev', 'prod'"
+}
+
 variable "log_bucket_owner_id" {
   type        = string
   description = "IAM id for the logs bucket owner (differs per region)"

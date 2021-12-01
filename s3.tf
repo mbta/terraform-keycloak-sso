@@ -1,6 +1,6 @@
 resource "aws_s3_bucket" "mbta-lb-access-logs" {
   acl           = "private"
-  bucket        = "mbta-lb-access-logs"
+  bucket        = "mbta-keycloak-${var.environment}-lb-access-logs"
   force_destroy = true
 
   policy = <<POLICY

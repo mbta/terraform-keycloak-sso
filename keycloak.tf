@@ -1,5 +1,5 @@
 resource "aws_ecs_cluster" "keycloak-cluster" {
-  name = "keycloak-cluster"
+  name = "keycloak-${var.environment}-cluster"
 
   setting {
     name  = "containerInsights"
@@ -13,7 +13,7 @@ resource "aws_ecs_cluster" "keycloak-cluster" {
 }
 
 resource "aws_cloudwatch_log_group" "keycloak-log-group" {
-  name              = "keycloak-logs"
+  name              = "keycloak-${var.environment}-logs"
   retention_in_days = 30
   tags = {
     project = "MBTA-Keycloak"
@@ -24,7 +24,7 @@ resource "aws_cloudwatch_log_group" "keycloak-log-group" {
 
 resource "aws_security_group" "keycloak-sg" {
   vpc_id = aws_vpc.keycloak-vpc.id
-  name   = "keycloak-sg"
+  name   = "keycloak-${var.environment}-sg"
 
   ingress {
     from_port       = 0
@@ -49,12 +49,12 @@ resource "aws_security_group" "keycloak-sg" {
 }
 
 resource "aws_ecs_task_definition" "aws-ecs-keycloak-taskdef" {
-  family = "keycloak-task"
+  family = "keycloak-${var.environment}-task"
 
   container_definitions = <<DEFINITION
   [
     {
-      "name": "keycloak",
+      "name": "keycloak-${var.environment}",
       "image": "${var.ecr_keycloak_image_url}:latest",
       "entryPoint": [],
       "environment": [
@@ -120,7 +120,7 @@ data "aws_ecs_task_definition" "main" {
 
 
 resource "aws_ecs_service" "keycloak-service" {
-  name                 = "keycloak-service"
+  name                 = "keycloak-${var.environment}-service"
   cluster              = aws_ecs_cluster.keycloak-cluster.id
   task_definition      = "${aws_ecs_task_definition.aws-ecs-keycloak-taskdef.family}:${max(aws_ecs_task_definition.aws-ecs-keycloak-taskdef.revision, data.aws_ecs_task_definition.main.revision)}"
   launch_type          = "FARGATE"
@@ -139,7 +139,7 @@ resource "aws_ecs_service" "keycloak-service" {
 
   load_balancer {
     target_group_arn = aws_lb_target_group.target-group.arn
-    container_name   = "keycloak"
+    container_name   = "keycloak-${var.environment}"
     container_port   = 8080
   }
 
