@@ -8,7 +8,7 @@ variable "ecr_keycloak_image_url" {
   description = "ECR Keycloak Image location"
 }
 
-variable "log-bucket-owner-id" {
+variable "log_bucket_owner_id" {
   type        = string
   description = "IAM id for the logs bucket owner (differs per region)"
 }
@@ -49,4 +49,3 @@ variable "kc_password" {
   type        = string
   description = "Keycloak admin user password"
 }
-

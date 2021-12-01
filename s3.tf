@@ -10,7 +10,7 @@ resource "aws_s3_bucket" "mbta-lb-access-logs" {
      {
         "Effect": "Allow",
         "Principal": {
-          "AWS": "arn:aws:iam::${var.log-bucket-owner-id}:root"
+          "AWS": "arn:aws:iam::${var.log_bucket_owner_id}:root"
         },
         "Action": "s3:PutObject",
         "Resource": "arn:aws:s3:::mbta-lb-access-logs/*"
