@@ -99,7 +99,7 @@ resource "aws_db_instance" "keycloak-database-engine" {
   monitoring_role_arn    = aws_iam_role.keycloak-db-monitoring-role.arn
 
   # this value leaks into state and thus should be changed on creation
-  password               = "changethisvalueondbcreation"
+  password = "changethisvalueondbcreation"
 
   lifecycle {
     ignore_changes = [
