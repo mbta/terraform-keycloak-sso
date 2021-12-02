@@ -1,0 +1,20 @@
+# Local .terraform directories
+**/.terraform/*
+
+# terraform state backups
+terraform.tfstate.*
+# terraform plan files
+*.tfplan
+
+# log files
+*.log
+
+# Ignore override files as they are usually used to override resources locally
+# and so are not checked in
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# ignore tfvars files as this repo is meant to be used by other modules
+*.tfvars
