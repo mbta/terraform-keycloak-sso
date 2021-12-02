@@ -65,7 +65,6 @@ resource "aws_ecs_task_definition" "aws-ecs-keycloak-taskdef" {
       "entryPoint": [],
       "environment": [
         {"name":"KEYCLOAK_USER", "value":"${var.kc_username}"},
-        {"name":"KEYCLOAK_PASSWORD", "value":"${var.kc_password}"},
         {"name":"PROXY_ADDRESS_FORWARDING", "value":"true"},
         {"name":"KEYCLOAK_LOGLEVEL", "value":"INFO"},
         {"name":"ROOT_LOGLEVEL", "value":"INFO"},
@@ -73,13 +72,16 @@ resource "aws_ecs_task_definition" "aws-ecs-keycloak-taskdef" {
         {"name":"DB_ADDR", "value":"${data.aws_db_instance.database.endpoint}"},
         {"name":"DB_DATABASE", "value":"${var.db_name}"},
         {"name":"DB_USER", "value":"${var.db_username}"},
-        {"name":"DB_PASSWORD", "value":"${var.db_password}"},
         {"name":"JDBC_PARAMS", "value":"autoReconnect=true"},
         {"name":"JAVA_OPTS_APPEND", "value":"-Xmx1500m"},
         {"name":"JGROUPS_DISCOVERY_PROTOCOL", "value":"JDBC_PING"},
         {"name":"JGROUPS_DISCOVERY_PROPERTIES", "value":"datasource_jndi_name=java:jboss/datasources/KeycloakDS,remove_old_coords_on_view_change=true"},
         {"name":"CACHE_OWNERS_COUNT", "value":"2"},
         {"name":"CACHE_OWNERS_AUTH_SESSIONS_COUNT", "value":"2"}
+      ],
+      "secrets": [
+        {"name":"KEYCLOAK_PASSWORD", "valueFrom":"${aws_secretsmanager_secret.keycloak-admin-password.arn}"},
+        {"name":"DB_PASSWORD", "valueFrom":"${aws_secretsmanager_secret.keycloak-database-password.arn}"}
       ],
       "essential": true,
       "logConfiguration": {
