@@ -1,11 +1,13 @@
-# TODO will be removed
+# certificate generation is optional, only used if var isn't passed
 resource "tls_private_key" "keycloak-pk" {
+  count = var.acm_certificate_arn == null ? 1 : 0
   algorithm = "RSA"
 }
 
 resource "tls_self_signed_cert" "keycloak-certificate-body" {
+  count = var.acm_certificate_arn == null ? 1 : 0
   key_algorithm   = "RSA"
-  private_key_pem = tls_private_key.keycloak-pk.private_key_pem
+  private_key_pem = tls_private_key.keycloak-pk.*.private_key_pem
 
   subject {
     common_name  = "mbta-login.integsoft.com"
@@ -22,15 +24,7 @@ resource "tls_self_signed_cert" "keycloak-certificate-body" {
 }
 
 resource "aws_acm_certificate" "keycloak-certificate" {
-  private_key      = tls_private_key.keycloak-pk.private_key_pem
-  certificate_body = tls_self_signed_cert.keycloak-certificate-body.cert_pem
+  count = var.acm_certificate_arn == null ? 1 : 0
+  private_key      = tls_private_key.keycloak-pk.*.private_key_pem
+  certificate_body = tls_self_signed_cert.keycloak-certificate-body.*.cert_pem
 }
-
-data "aws_acm_certificate" "mbta" {
-  domain   = "mbta-login.integsoft.com"
-  statuses = ["ISSUED"]
-  most_recent = true
-
-  depends_on = [aws_acm_certificate.keycloak-certificate]
-}
-

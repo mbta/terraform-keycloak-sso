@@ -1,3 +1,8 @@
+variable "acm_certificate_arn" {
+  type = string
+  description = "(optional) ARN of certificate for load balancer to use. Defaults to auto-creating a new certificate"
+  default = null
+}
 variable "aws_region" {
   type        = string
   description = "AWS Region"

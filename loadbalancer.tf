@@ -1,3 +1,7 @@
+locals {
+  certificate_arn = var.acm_certificate_arn == null ? aws_acm_certificate.keycloak-certificate.*.arn : var.acm_certificate_arn
+}
+
 resource "aws_security_group" "load-balancer-sg" {
   vpc_id = aws_vpc.keycloak-vpc.id
   name   = "keycloak-${var.environment}-load-balancer-sg"
@@ -79,18 +83,13 @@ resource "aws_lb_listener" "listener" {
   load_balancer_arn = aws_alb.application-load-balancer.id
   port              = "443"
   protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = data.aws_acm_certificate.mbta.arn
+  ssl_policy        = "ELBSecurityPolicy-FS-1-2-Res-2020-10"
+  certificate_arn   = local.certificate_arn
 
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.target-group.id
   }
-}
-
-resource "aws_lb_listener_certificate" "keycloak-lb-certificate" {
-  listener_arn    = aws_lb_listener.listener.arn
-  certificate_arn = aws_acm_certificate.keycloak-certificate.arn
 }
 
 data "aws_lb" "keycloak-alb-ref" {
