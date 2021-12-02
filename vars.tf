@@ -45,6 +45,12 @@ variable "environment" {
   description = "Name of environment, e.g. 'dev', 'prod'"
 }
 
+variable "hostname" {
+  type        = string
+  description = "(optional) DNS hostname of the Keycloak instance. Only needed if generating a certificate within this module"
+  default     = "keycloak.example.com"
+}
+
 variable "kc_username" {
   type        = string
   description = "Keycloak admin username"
@@ -53,6 +59,11 @@ variable "kc_username" {
 variable "log_bucket_owner_id" {
   type        = string
   description = "IAM id for the logs bucket owner (differs per region)"
+}
+
+variable "organization" {
+  type        = string
+  description = "The name of the organization that owns this Keycloak instance"
 }
 
 variable "private_subnets" {

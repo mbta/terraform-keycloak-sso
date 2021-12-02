@@ -10,8 +10,8 @@ resource "tls_self_signed_cert" "keycloak-certificate-body" {
   private_key_pem = tls_private_key.keycloak-pk.*.private_key_pem
 
   subject {
-    common_name  = "mbta-login.integsoft.com"
-    organization = "Integsoft"
+    common_name  = var.hostname
+    organization = var.organization
   }
 
   validity_period_hours = 8760
