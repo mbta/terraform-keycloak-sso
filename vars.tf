@@ -4,10 +4,6 @@ variable "acm_certificate_arn" {
   default     = null
 }
 
-variable "availability_zones" {
-  description = "List of availability zones"
-}
-
 variable "aws_region" {
   type        = string
   description = "AWS Region"
