@@ -1,4 +1,10 @@
+locals {
+  db_subnet_group = var.database_subnet_group == null ? aws_db_subnet_group.keycloak-database-subnet.*.name : var.database_subnet_group
+}
+
 resource "aws_db_subnet_group" "keycloak-database-subnet" {
+  count = var.database_subnet_group == null ? 1 : 0
+
   name       = "keycloak-${var.environment}-database-subnet"
   subnet_ids = var.private_subnets
 
@@ -82,7 +88,7 @@ resource "aws_db_instance" "keycloak-database-engine" {
   engine                                = "mariadb"
   engine_version                        = "10.5.12"
   instance_class                        = "db.t2.micro"
-  db_subnet_group_name                  = "${aws_db_subnet_group.keycloak-database-subnet.name}"
+  db_subnet_group_name                  = local.db_subnet_group
   multi_az                              = true
   username                              = "${var.db_username}"
   password                              = "${var.db_password}"

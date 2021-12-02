@@ -8,6 +8,12 @@ variable "aws_region" {
   description = "AWS Region"
 }
 
+variable "database_subnet_group" {
+  type = string
+  description = "(optional) Name of a database subnet group where Keycloak MariaDB instance will reside. Defaults to creating a new subnet group containing var.private_subnets"
+  default = null
+}
+
 variable "ecr_keycloak_image_url" {
   type        = string
   description = "(optional) ECR Keycloak Image location. Defaults to creating a new ECR repo"
