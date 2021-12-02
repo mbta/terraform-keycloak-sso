@@ -91,13 +91,21 @@ resource "aws_db_instance" "keycloak-database-engine" {
   db_subnet_group_name   = local.db_subnet_group
   multi_az               = true
   username               = var.db_username
-  password               = var.db_password
   parameter_group_name   = "rds-keycloak-${var.environment}-mariadb-pg"
   option_group_name      = "rds-keycloak-${var.environment}-mariadb-og"
   vpc_security_group_ids = [aws_security_group.database-sg.id]
   skip_final_snapshot    = true
   monitoring_interval    = 15
   monitoring_role_arn    = aws_iam_role.keycloak-db-monitoring-role.arn
+
+  # this value leaks into state and thus should be changed on creation
+  password               = "changethisvalueondbcreation"
+
+  lifecycle {
+    ignore_changes = [
+      password,
+    ]
+  }
 
   tags = {
     project = "MBTA-Keycloak"
