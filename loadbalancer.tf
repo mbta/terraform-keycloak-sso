@@ -37,8 +37,8 @@ resource "aws_alb" "application-load-balancer" {
 
   # LB access logs
   access_logs {
-    bucket  = aws_s3_bucket.mbta-lb-access-logs.bucket
-    prefix  = "lb-keycloak"
+    bucket  = aws_s3_bucket.lb-access-logs.id
+    prefix  = "lb-keycloak-${var.environment}"
     enabled = true
   }
 
@@ -47,7 +47,7 @@ resource "aws_alb" "application-load-balancer" {
     Name    = "Keycloak-alb"
   }
 
-  depends_on = [aws_s3_bucket.mbta-lb-access-logs]
+  depends_on = [aws_s3_bucket.lb-access-logs]
 }
 
 resource "aws_lb_target_group" "target-group" {

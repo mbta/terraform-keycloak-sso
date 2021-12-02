@@ -56,11 +56,6 @@ variable "kc_username" {
   description = "Keycloak admin username"
 }
 
-variable "log_bucket_owner_id" {
-  type        = string
-  description = "IAM id for the logs bucket owner (differs per region)"
-}
-
 variable "organization" {
   type        = string
   description = "The name of the organization that owns this Keycloak instance"
