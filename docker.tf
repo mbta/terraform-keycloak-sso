@@ -7,10 +7,10 @@ resource "aws_ecr_repository" "keycloak-image-repository" {
   image_scanning_configuration {
     scan_on_push = true
   }
-  
+
   tags = {
-     project = "MBTA-Keycloak"
-     Name    = "Integsoft Image repository"
+    project = "MBTA-Keycloak"
+    Name    = "Integsoft Image repository"
   }
 }
 

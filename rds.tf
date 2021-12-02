@@ -9,8 +9,8 @@ resource "aws_db_subnet_group" "keycloak-database-subnet" {
   subnet_ids = var.private_subnets
 
   tags = {
-    Name     = "Keycloak Database subnet"
-    project  = "MBTA-Keycloak"
+    Name    = "Keycloak Database subnet"
+    project = "MBTA-Keycloak"
   }
 }
 
@@ -35,7 +35,7 @@ resource "aws_security_group" "database-sg" {
 
   tags = {
     project = "MBTA-Keycloak"
-    Name        = "Database-sg"
+    Name    = "Database-sg"
   }
 }
 
@@ -52,7 +52,7 @@ resource "aws_db_parameter_group" "rds-mariadb-pg" {
     name  = "character_set_client"
     value = "utf8"
   }
-  
+
   tags = {
     project = "MBTA-Keycloak"
     Name    = "Database-pg"
@@ -73,7 +73,7 @@ resource "aws_db_option_group" "rds-mariadb-og" {
       value = "ON"
     }*/
   }
-  
+
   tags = {
     project = "MBTA-Keycloak"
     Name    = "Database-pg"
@@ -81,30 +81,30 @@ resource "aws_db_option_group" "rds-mariadb-og" {
 }
 
 resource "aws_db_instance" "keycloak-database-engine" {
-  name                                  = "${var.db_name}"
-  identifier                            = "keycloak-${var.environment}-database-engine"
-  allocated_storage                     = 20
-  max_allocated_storage                 = 100
-  engine                                = "mariadb"
-  engine_version                        = "10.5.12"
-  instance_class                        = "db.t2.micro"
-  db_subnet_group_name                  = local.db_subnet_group
-  multi_az                              = true
-  username                              = "${var.db_username}"
-  password                              = "${var.db_password}"
-  parameter_group_name                  = "rds-keycloak-${var.environment}-mariadb-pg"
-  option_group_name                     = "rds-keycloak-${var.environment}-mariadb-og"
-  vpc_security_group_ids                = [aws_security_group.database-sg.id]
-  skip_final_snapshot                   = true
-  monitoring_interval                   = 15
-  monitoring_role_arn                   = aws_iam_role.keycloak-db-monitoring-role.arn
+  name                   = var.db_name
+  identifier             = "keycloak-${var.environment}-database-engine"
+  allocated_storage      = 20
+  max_allocated_storage  = 100
+  engine                 = "mariadb"
+  engine_version         = "10.5.12"
+  instance_class         = "db.t2.micro"
+  db_subnet_group_name   = local.db_subnet_group
+  multi_az               = true
+  username               = var.db_username
+  password               = var.db_password
+  parameter_group_name   = "rds-keycloak-${var.environment}-mariadb-pg"
+  option_group_name      = "rds-keycloak-${var.environment}-mariadb-og"
+  vpc_security_group_ids = [aws_security_group.database-sg.id]
+  skip_final_snapshot    = true
+  monitoring_interval    = 15
+  monitoring_role_arn    = aws_iam_role.keycloak-db-monitoring-role.arn
 
   tags = {
     project = "MBTA-Keycloak"
     Name    = "Keycloak Database"
   }
-  
-  depends_on = [aws_db_option_group.rds-mariadb-og,aws_db_parameter_group.rds-mariadb-pg,aws_iam_role.keycloak-db-monitoring-role]
+
+  depends_on = [aws_db_option_group.rds-mariadb-og, aws_db_parameter_group.rds-mariadb-pg, aws_iam_role.keycloak-db-monitoring-role]
 }
 
 /*resource "aws_db_snapshot" "keycloak-db-snapshots" {
@@ -114,7 +114,7 @@ resource "aws_db_instance" "keycloak-database-engine" {
 
 data "aws_db_instance" "database" {
   db_instance_identifier = "keycloak-${var.environment}-database-engine"
-  
+
   depends_on = [aws_db_instance.keycloak-database-engine]
 }
 

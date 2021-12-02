@@ -23,8 +23,8 @@ resource "aws_security_group" "load-balancer-sg" {
   }
 
   tags = {
-    project     = "MBTA-Keycloak"
-    Name        = "Keycloak-alb-sg"
+    project = "MBTA-Keycloak"
+    Name    = "Keycloak-alb-sg"
   }
 }
 
@@ -43,8 +43,8 @@ resource "aws_alb" "application-load-balancer" {
   }
 
   tags = {
-    project     = "MBTA-Keycloak"
-    Name        = "Keycloak-alb"
+    project = "MBTA-Keycloak"
+    Name    = "Keycloak-alb"
   }
 
   depends_on = [aws_s3_bucket.mbta-lb-access-logs]
@@ -59,7 +59,7 @@ resource "aws_lb_target_group" "target-group" {
 
   stickiness {
     enabled = true
-    type     = "lb_cookie"
+    type    = "lb_cookie"
   }
 
   health_check {
@@ -73,8 +73,8 @@ resource "aws_lb_target_group" "target-group" {
   }
 
   tags = {
-    project     = "MBTA-Keycloak"
-    Name        = "Keycloak-lb-tg"
+    project = "MBTA-Keycloak"
+    Name    = "Keycloak-lb-tg"
   }
 }
 
@@ -93,6 +93,6 @@ resource "aws_lb_listener" "listener" {
 }
 
 data "aws_lb" "keycloak-alb-ref" {
-  arn  = aws_alb.application-load-balancer.arn
+  arn = aws_alb.application-load-balancer.arn
 }
 

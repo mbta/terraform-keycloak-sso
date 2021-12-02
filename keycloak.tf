@@ -1,5 +1,5 @@
 locals {
-  keycloak_image_url = var.ecr_keycloak_image_url == null ? aws_ecr_repository.keycloak-image-repository.*.repository_url : var.ecr_keycloak_image_url
+  keycloak_image_url       = var.ecr_keycloak_image_url == null ? aws_ecr_repository.keycloak-image-repository.*.repository_url : var.ecr_keycloak_image_url
   keycloak_ecs_cluster_arn = var.ecs_cluster_arn == null ? aws_ecs_cluster.keycloak-cluster.*.arn : var.ecs_cluster_arn
 }
 
@@ -12,10 +12,10 @@ resource "aws_ecs_cluster" "keycloak-cluster" {
     name  = "containerInsights"
     value = "enabled"
   }
-  
+
   tags = {
-     project = "MBTA-Keycloak"
-     Name    = "Keycloak ESC cluster"
+    project = "MBTA-Keycloak"
+    Name    = "Keycloak ESC cluster"
   }
 }
 
@@ -50,7 +50,7 @@ resource "aws_security_group" "keycloak-sg" {
 
   tags = {
     project = "MBTA-Keycloak"
-    Name        = "Keycloak-service-sg"
+    Name    = "Keycloak-service-sg"
   }
 }
 
@@ -118,7 +118,7 @@ resource "aws_ecs_task_definition" "aws-ecs-keycloak-taskdef" {
 
   tags = {
     project = "MBTA-Keycloak"
-    Name        = "keycloak-ecs-taskdef"
+    Name    = "keycloak-ecs-taskdef"
   }
 }
 
@@ -151,6 +151,6 @@ resource "aws_ecs_service" "keycloak-service" {
     container_port   = 8080
   }
 
-  depends_on = [aws_lb_listener.listener,aws_iam_role.ecs-execution-task-role,aws_db_instance.keycloak-database-engine]
+  depends_on = [aws_lb_listener.listener, aws_iam_role.ecs-execution-task-role, aws_db_instance.keycloak-database-engine]
 }
 
