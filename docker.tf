@@ -1,5 +1,7 @@
-resource "aws_ecr_repository" "integsoft-images-repository" {
-  name                 = "integsoft/keycloak"
+resource "aws_ecr_repository" "keycloak-image-repository" {
+  count = var.ecr_keycloak_image_url == null ? 1 : 0
+
+  name                 = "keycloak"
   image_tag_mutability = "MUTABLE"
 
   image_scanning_configuration {

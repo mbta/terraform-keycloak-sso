@@ -1,3 +1,7 @@
+locals {
+  keycloak_image_url = var.ecr_keycloak_image_url == null ? aws_ecr_repository.keycloak-image-repository.*.repository_url : var.ecr_keycloak_image_url
+}
+
 resource "aws_ecs_cluster" "keycloak-cluster" {
   name = "keycloak-${var.environment}-cluster"
 
@@ -55,7 +59,7 @@ resource "aws_ecs_task_definition" "aws-ecs-keycloak-taskdef" {
   [
     {
       "name": "keycloak-${var.environment}",
-      "image": "${var.ecr_keycloak_image_url}:latest",
+      "image": "${local.keycloak_image_url}:latest",
       "entryPoint": [],
       "environment": [
         {"name":"KEYCLOAK_USER", "value":"${var.kc_username}"},

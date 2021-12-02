@@ -10,7 +10,8 @@ variable "aws_region" {
 
 variable "ecr_keycloak_image_url" {
   type        = string
-  description = "ECR Keycloak Image location"
+  description = "(optional) ECR Keycloak Image location. Defaults to creating a new ECR repo"
+  default = null
 }
 
 variable "environment" {
