@@ -10,7 +10,7 @@ resource "aws_db_subnet_group" "keycloak-database-subnet" {
 
   tags = {
     Name    = "Keycloak Database subnet"
-    project = "MBTA-Keycloak"
+    project = "Keycloak"
   }
 }
 
@@ -34,7 +34,7 @@ resource "aws_security_group" "database-sg" {
   }
 
   tags = {
-    project = "MBTA-Keycloak"
+    project = "Keycloak"
     Name    = "Database-sg"
   }
 }
@@ -54,7 +54,7 @@ resource "aws_db_parameter_group" "rds-mariadb-pg" {
   }
 
   tags = {
-    project = "MBTA-Keycloak"
+    project = "Keycloak"
     Name    = "Database-pg"
   }
 }
@@ -75,7 +75,7 @@ resource "aws_db_option_group" "rds-mariadb-og" {
   }
 
   tags = {
-    project = "MBTA-Keycloak"
+    project = "Keycloak"
     Name    = "Database-pg"
   }
 }
@@ -108,7 +108,7 @@ resource "aws_db_instance" "keycloak-database-engine" {
   }
 
   tags = {
-    project = "MBTA-Keycloak"
+    project = "Keycloak"
     Name    = "Keycloak Database"
   }
 

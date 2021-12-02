@@ -23,7 +23,7 @@ resource "aws_security_group" "load-balancer-sg" {
   }
 
   tags = {
-    project = "MBTA-Keycloak"
+    project = "Keycloak"
     Name    = "Keycloak-alb-sg"
   }
 }
@@ -43,7 +43,7 @@ resource "aws_alb" "application-load-balancer" {
   }
 
   tags = {
-    project = "MBTA-Keycloak"
+    project = "Keycloak"
     Name    = "Keycloak-alb"
   }
 
@@ -73,7 +73,7 @@ resource "aws_lb_target_group" "target-group" {
   }
 
   tags = {
-    project = "MBTA-Keycloak"
+    project = "Keycloak"
     Name    = "Keycloak-lb-tg"
   }
 }

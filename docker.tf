@@ -9,7 +9,7 @@ resource "aws_ecr_repository" "keycloak-image-repository" {
   }
 
   tags = {
-    project = "MBTA-Keycloak"
+    project = "Keycloak"
     Name    = "Integsoft Image repository"
   }
 }

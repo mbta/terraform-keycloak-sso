@@ -41,7 +41,7 @@ resource "aws_s3_bucket" "mbta-lb-access-logs" {
 POLICY
 
   tags = {
-    project = "MBTA-Keycloak"
+    project = "Keycloak"
     Name    = "Keycloak-LB-Logs"
   }
 }

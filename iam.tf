@@ -14,7 +14,7 @@ resource "aws_iam_role" "ecs-execution-task-role" {
   assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
 
   tags = {
-    project = "MBTA-Keycloak"
+    project = "Keycloak"
     Name    = "Keycloak-ECS-Exec-Role"
   }
 }
@@ -45,7 +45,7 @@ resource "aws_iam_role" "keycloak-db-monitoring-role" {
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AmazonRDSEnhancedMonitoringRole"]
 
   tags = {
-    project = "MBTA-Keycloak"
+    project = "Keycloak"
     Name    = "Keycloak-DB-Monitoring-Role"
   }
 }

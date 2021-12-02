@@ -14,7 +14,7 @@ resource "aws_ecs_cluster" "keycloak-cluster" {
   }
 
   tags = {
-    project = "MBTA-Keycloak"
+    project = "Keycloak"
     Name    = "Keycloak ESC cluster"
   }
 }
@@ -23,7 +23,7 @@ resource "aws_cloudwatch_log_group" "keycloak-log-group" {
   name              = "keycloak-${var.environment}-logs"
   retention_in_days = 30
   tags = {
-    project = "MBTA-Keycloak"
+    project = "Keycloak"
     Name    = "Keycloak CloudWatch"
   }
 }
@@ -49,7 +49,7 @@ resource "aws_security_group" "keycloak-sg" {
   }
 
   tags = {
-    project = "MBTA-Keycloak"
+    project = "Keycloak"
     Name    = "Keycloak-service-sg"
   }
 }
@@ -117,7 +117,7 @@ resource "aws_ecs_task_definition" "aws-ecs-keycloak-taskdef" {
   task_role_arn            = aws_iam_role.ecs-execution-task-role.arn
 
   tags = {
-    project = "MBTA-Keycloak"
+    project = "Keycloak"
     Name    = "keycloak-ecs-taskdef"
   }
 }
