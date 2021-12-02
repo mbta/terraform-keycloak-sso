@@ -1,4 +1,6 @@
 resource "aws_s3_bucket" "lb-access-logs" {
+  count = var.lb_access_logs_s3_bucket == null ? 1 : 0
+
   acl           = "private"
   bucket        = "${lower(var.organization)}-keycloak-${var.environment}-lb-access-logs"
   force_destroy = true

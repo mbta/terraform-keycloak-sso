@@ -1,5 +1,6 @@
 locals {
   certificate_arn = var.acm_certificate_arn == null ? join("", aws_acm_certificate.keycloak-certificate.*.arn) : var.acm_certificate_arn
+  lb_log_bucket   = var.lb_access_logs_s3_bucket == null ? join("", aws_s3_bucket.lb-access-logs.*.id) : var.lb_access_logs_s3_bucket
 }
 
 resource "aws_security_group" "load-balancer-sg" {
@@ -37,8 +38,8 @@ resource "aws_alb" "application-load-balancer" {
 
   # LB access logs
   access_logs {
-    bucket  = aws_s3_bucket.lb-access-logs.id
-    prefix  = "lb-keycloak-${var.environment}"
+    bucket  = local.lb_log_bucket
+    prefix  = "keycloak-${var.environment}"
     enabled = true
   }
 
@@ -46,8 +47,6 @@ resource "aws_alb" "application-load-balancer" {
     project = "Keycloak"
     Name    = "Keycloak-alb"
   }
-
-  depends_on = [aws_s3_bucket.lb-access-logs]
 }
 
 resource "aws_lb_target_group" "target-group" {

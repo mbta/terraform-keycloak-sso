@@ -53,6 +53,12 @@ variable "kc_username" {
   description = "Keycloak admin username"
 }
 
+variable "lb_access_logs_s3_bucket" {
+  type        = string
+  description = "(optional) Name of S3 bucket where logs will be stored. Defaults to creating a new S3 bucket"
+  default     = null
+}
+
 variable "organization" {
   type        = string
   description = "The name of the organization that owns this Keycloak instance"
