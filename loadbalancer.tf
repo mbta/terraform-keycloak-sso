@@ -1,5 +1,5 @@
 locals {
-  certificate_arn = var.acm_certificate_arn == null ? aws_acm_certificate.keycloak-certificate.*.arn : var.acm_certificate_arn
+  certificate_arn = var.acm_certificate_arn == null ? join("", aws_acm_certificate.keycloak-certificate.*.arn) : var.acm_certificate_arn
 }
 
 resource "aws_security_group" "load-balancer-sg" {
