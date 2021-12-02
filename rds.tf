@@ -1,5 +1,5 @@
 locals {
-  db_subnet_group = var.database_subnet_group == null ? aws_db_subnet_group.keycloak-database-subnet.*.name : var.database_subnet_group
+  db_subnet_group = var.database_subnet_group == null ? join("", aws_db_subnet_group.keycloak-database-subnet.*.name) : var.database_subnet_group
 }
 
 resource "aws_db_subnet_group" "keycloak-database-subnet" {
