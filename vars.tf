@@ -29,11 +29,18 @@ variable "log_bucket_owner_id" {
 }
 
 variable "public_subnets" {
-  description = "List of public subnets"
+  type = list(string)
+  description = "List of public subnets in the VPC where Keycloak will reside"
 }
 
 variable "private_subnets" {
-  description = "List of private subnets"
+  type = list(string)
+  description = "List of private subnets in the VPC where Keycloak will reside"
+}
+
+variable "vpc_id" {
+  type = string
+  description = "ID of an existing VPC where Keycloak will reside"
 }
 
 variable "availability_zones" {

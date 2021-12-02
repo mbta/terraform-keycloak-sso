@@ -3,7 +3,7 @@ locals {
 }
 
 resource "aws_security_group" "load-balancer-sg" {
-  vpc_id = aws_vpc.keycloak-vpc.id
+  vpc_id = var.vpc_id
   name   = "keycloak-${var.environment}-load-balancer-sg"
 
   ingress {
@@ -32,7 +32,7 @@ resource "aws_alb" "application-load-balancer" {
   name               = "keycloak-${var.environment}-alb"
   internal           = false
   load_balancer_type = "application"
-  subnets            = aws_subnet.public.*.id
+  subnets            = var.public_subnets
   security_groups    = [aws_security_group.load-balancer-sg.id]
 
   # LB access logs
@@ -55,7 +55,7 @@ resource "aws_lb_target_group" "target-group" {
   port        = 8080
   protocol    = "HTTP"
   target_type = "ip"
-  vpc_id      = aws_vpc.keycloak-vpc.id
+  vpc_id      = var.vpc_id
 
   stickiness {
     enabled = true

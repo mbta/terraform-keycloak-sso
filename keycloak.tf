@@ -30,15 +30,14 @@ resource "aws_cloudwatch_log_group" "keycloak-log-group" {
 
 
 resource "aws_security_group" "keycloak-sg" {
-  vpc_id = aws_vpc.keycloak-vpc.id
+  vpc_id = var.vpc_id
   name   = "keycloak-${var.environment}-sg"
 
   ingress {
     from_port       = 0
     to_port         = 0
     protocol        = "-1"
-    cidr_blocks      = ["10.10.0.0/16"]
-    #security_groups = [aws_security_group.load-balancer-sg.id]
+    security_groups = [aws_security_group.load-balancer-sg.id]
   }
 
   egress {
@@ -136,7 +135,7 @@ resource "aws_ecs_service" "keycloak-service" {
   force_new_deployment = true
 
   network_configuration {
-    subnets          = aws_subnet.private.*.id
+    subnets          = var.private_subnets
     assign_public_ip = false
     security_groups = [
       aws_security_group.keycloak-sg.id,

@@ -1,6 +1,6 @@
 resource "aws_db_subnet_group" "keycloak-database-subnet" {
   name       = "keycloak-${var.environment}-database-subnet"
-  subnet_ids = aws_subnet.private.*.id
+  subnet_ids = var.private_subnets
 
   tags = {
     Name     = "Keycloak Database subnet"
@@ -9,14 +9,14 @@ resource "aws_db_subnet_group" "keycloak-database-subnet" {
 }
 
 resource "aws_security_group" "database-sg" {
-  vpc_id = aws_vpc.keycloak-vpc.id
+  vpc_id = var.vpc_id
   name   = "keycloak-${var.environment}-database-sg"
   ingress {
     description     = "MariaDB port"
     from_port       = 3306
     to_port         = 3306
     protocol        = "tcp"
-    cidr_blocks      = [aws_vpc.keycloak-vpc.cidr_block]
+    security_groups = [aws_security_group.keycloak-sg.id]
   }
 
   egress {
