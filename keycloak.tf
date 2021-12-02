@@ -1,8 +1,11 @@
 locals {
   keycloak_image_url = var.ecr_keycloak_image_url == null ? aws_ecr_repository.keycloak-image-repository.*.repository_url : var.ecr_keycloak_image_url
+  keycloak_ecs_cluster_arn = var.ecs_cluster_arn == null ? aws_ecs_cluster.keycloak-cluster.*.arn : var.ecs_cluster_arn
 }
 
 resource "aws_ecs_cluster" "keycloak-cluster" {
+  count = var.ecs_cluster_arn == null ? 1 : 0
+
   name = "keycloak-${var.environment}-cluster"
 
   setting {
@@ -125,7 +128,7 @@ data "aws_ecs_task_definition" "main" {
 
 resource "aws_ecs_service" "keycloak-service" {
   name                 = "keycloak-${var.environment}-service"
-  cluster              = aws_ecs_cluster.keycloak-cluster.id
+  cluster              = local.keycloak_ecs_cluster_arn
   task_definition      = "${aws_ecs_task_definition.aws-ecs-keycloak-taskdef.family}:${max(aws_ecs_task_definition.aws-ecs-keycloak-taskdef.revision, data.aws_ecs_task_definition.main.revision)}"
   launch_type          = "FARGATE"
   scheduling_strategy  = "REPLICA"

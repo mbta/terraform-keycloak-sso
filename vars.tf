@@ -13,6 +13,10 @@ variable "ecr_keycloak_image_url" {
   description = "(optional) ECR Keycloak Image location. Defaults to creating a new ECR repo"
   default = null
 }
+variable "ecs_cluster_arn" {
+  type = string
+  description = "(optional) ARN of an existing ECS cluster. Defaults to creating a new ECS cluster"
+}
 
 variable "environment" {
   type = string
