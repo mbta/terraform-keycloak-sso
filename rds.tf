@@ -2,6 +2,11 @@ locals {
   db_subnet_group = var.database_subnet_group == null ? join("", aws_db_subnet_group.keycloak-database-subnet.*.name) : var.database_subnet_group
 }
 
+resource "random_password" "database-password" {
+  length  = 32
+  special = false
+}
+
 resource "aws_db_subnet_group" "keycloak-database-subnet" {
   count = var.database_subnet_group == null ? 1 : 0
 
@@ -98,8 +103,9 @@ resource "aws_db_instance" "keycloak-database-engine" {
   monitoring_interval    = 15
   monitoring_role_arn    = aws_iam_role.keycloak-db-monitoring-role.arn
 
-  # this value leaks into state and thus should be changed on creation
-  password = "changethisvalueondbcreation"
+  # this value leaks into state and thus should be changed on creation.
+  # any changes are ignored by the lifecycle policy below.
+  password = random_password.database-password.result
 
   lifecycle {
     ignore_changes = [
