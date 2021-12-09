@@ -34,7 +34,7 @@ resource "aws_security_group" "keycloak-sg" {
     from_port       = 0
     to_port         = 0
     protocol        = "-1"
-    security_groups = [aws_security_group.load-balancer-sg.id]
+    security_groups = [aws_security_group.keycloak-load-balancer-sg.id]
   }
 
   egress {
@@ -48,7 +48,7 @@ resource "aws_security_group" "keycloak-sg" {
   tags = var.tags
 }
 
-resource "aws_ecs_task_definition" "aws-ecs-keycloak-taskdef" {
+resource "aws_ecs_task_definition" "keycloak-ecs-taskdef" {
   family = "keycloak-${var.environment}-task"
 
   container_definitions = <<DEFINITION
@@ -107,21 +107,21 @@ resource "aws_ecs_task_definition" "aws-ecs-keycloak-taskdef" {
   network_mode             = "awsvpc"
   memory                   = "2048"
   cpu                      = "512"
-  execution_role_arn       = aws_iam_role.ecs-execution-task-role.arn
-  task_role_arn            = aws_iam_role.ecs-execution-task-role.arn
+  execution_role_arn       = aws_iam_role.keycloak-ecs-execution-task-role.arn
+  task_role_arn            = aws_iam_role.keycloak-ecs-execution-task-role.arn
 
   tags = var.tags
 }
 
 data "aws_ecs_task_definition" "main" {
-  task_definition = aws_ecs_task_definition.aws-ecs-keycloak-taskdef.family
+  task_definition = aws_ecs_task_definition.keycloak-ecs-taskdef.family
 }
 
 
 resource "aws_ecs_service" "keycloak-service" {
   name                 = "keycloak-${var.environment}-service"
   cluster              = local.keycloak_ecs_cluster_arn
-  task_definition      = "${aws_ecs_task_definition.aws-ecs-keycloak-taskdef.family}:${max(aws_ecs_task_definition.aws-ecs-keycloak-taskdef.revision, data.aws_ecs_task_definition.main.revision)}"
+  task_definition      = "${aws_ecs_task_definition.keycloak-ecs-taskdef.family}:${max(aws_ecs_task_definition.keycloak-ecs-taskdef.revision, data.aws_ecs_task_definition.main.revision)}"
   launch_type          = "FARGATE"
   scheduling_strategy  = "REPLICA"
   desired_count        = 2
@@ -132,16 +132,16 @@ resource "aws_ecs_service" "keycloak-service" {
     assign_public_ip = false
     security_groups = [
       aws_security_group.keycloak-sg.id,
-      aws_security_group.load-balancer-sg.id
+      aws_security_group.keycloak-load-balancer-sg.id
     ]
   }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.target-group.arn
+    target_group_arn = aws_lb_target_group.keycloak-target-group.arn
     container_name   = "keycloak-${var.environment}"
     container_port   = 8080
   }
 
-  depends_on = [aws_lb_listener.listener, aws_iam_role.ecs-execution-task-role, aws_db_instance.keycloak-database-engine]
+  depends_on = [aws_lb_listener.keycloak-listener, aws_iam_role.keycloak-ecs-execution-task-role, aws_db_instance.keycloak-database-engine]
 }
 

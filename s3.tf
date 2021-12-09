@@ -1,4 +1,4 @@
-resource "aws_s3_bucket" "lb-access-logs" {
+resource "aws_s3_bucket" "keycloak-lb-access-logs" {
   # only create this resource if lb_access_logs_s3_bucket is null
   count = var.lb_access_logs_s3_bucket == null ? 1 : 0
 

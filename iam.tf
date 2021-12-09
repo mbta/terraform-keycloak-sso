@@ -9,7 +9,7 @@ data "aws_iam_policy_document" "assume_role_policy" {
   }
 }
 
-resource "aws_iam_role" "ecs-execution-task-role" {
+resource "aws_iam_role" "keycloak-ecs-execution-task-role" {
   name               = "keycloak-${var.environment}-ecs-execution-task-role"
   assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
 
@@ -17,7 +17,7 @@ resource "aws_iam_role" "ecs-execution-task-role" {
 }
 
 resource "aws_iam_role_policy_attachment" "ecs-execution-task-policy" {
-  role       = aws_iam_role.ecs-execution-task-role.name
+  role       = aws_iam_role.keycloak-ecs-execution-task-role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
 }
 
