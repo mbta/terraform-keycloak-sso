@@ -107,15 +107,3 @@ resource "aws_db_instance" "keycloak-database-engine" {
 
   depends_on = [aws_db_option_group.rds-mariadb-og, aws_db_parameter_group.rds-mariadb-pg, aws_iam_role.keycloak-db-monitoring-role]
 }
-
-/*resource "aws_db_snapshot" "keycloak-db-snapshots" {
-  db_instance_identifier = aws_db_instance.keycloak-database-engine.id
-  db_snapshot_identifier = "keycloak-db-snapshot"
-}*/
-
-data "aws_db_instance" "database" {
-  db_instance_identifier = "keycloak-${var.environment}-database-engine"
-
-  depends_on = [aws_db_instance.keycloak-database-engine]
-}
-

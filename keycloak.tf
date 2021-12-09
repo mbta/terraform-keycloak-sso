@@ -63,7 +63,7 @@ resource "aws_ecs_task_definition" "keycloak-ecs-taskdef" {
         {"name":"KEYCLOAK_LOGLEVEL", "value":"INFO"},
         {"name":"ROOT_LOGLEVEL", "value":"INFO"},
         {"name":"DB_VENDOR", "value":"mariadb"},
-        {"name":"DB_ADDR", "value":"${data.aws_db_instance.database.endpoint}"},
+        {"name":"DB_ADDR", "value":"${aws_db_instance.keycloak-database-engine.endpoint}"},
         {"name":"DB_DATABASE", "value":"${var.db_name}"},
         {"name":"DB_USER", "value":"${var.db_username}"},
         {"name":"JDBC_PARAMS", "value":"autoReconnect=true"},
@@ -113,15 +113,10 @@ resource "aws_ecs_task_definition" "keycloak-ecs-taskdef" {
   tags = var.tags
 }
 
-data "aws_ecs_task_definition" "main" {
-  task_definition = aws_ecs_task_definition.keycloak-ecs-taskdef.family
-}
-
-
 resource "aws_ecs_service" "keycloak-service" {
   name                 = "keycloak-${var.environment}-service"
   cluster              = local.keycloak_ecs_cluster_arn
-  task_definition      = "${aws_ecs_task_definition.keycloak-ecs-taskdef.family}:${max(aws_ecs_task_definition.keycloak-ecs-taskdef.revision, data.aws_ecs_task_definition.main.revision)}"
+  task_definition      = aws_ecs_task_definition.keycloak-ecs-taskdef.arn
   launch_type          = "FARGATE"
   scheduling_strategy  = "REPLICA"
   desired_count        = 2

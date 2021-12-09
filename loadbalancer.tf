@@ -82,8 +82,3 @@ resource "aws_lb_listener" "keycloak-listener" {
     target_group_arn = aws_lb_target_group.keycloak-target-group.id
   }
 }
-
-data "aws_lb" "keycloak-alb-ref" {
-  arn = aws_alb.keycloak-load-balancer.arn
-}
-
