@@ -1,4 +1,5 @@
 locals {
+  # get these values from either input variables, or internal resources if the variables weren't passed
   certificate_arn = var.acm_certificate_arn == null ? join("", aws_acm_certificate.keycloak-certificate.*.arn) : var.acm_certificate_arn
   lb_log_bucket   = var.lb_access_logs_s3_bucket == null ? join("", aws_s3_bucket.lb-access-logs.*.id) : var.lb_access_logs_s3_bucket
 }

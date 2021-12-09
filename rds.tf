@@ -1,4 +1,5 @@
 locals {
+  # get this value from either input variables, or internal resources if the variables weren't passed
   db_subnet_group = var.database_subnet_group == null ? join("", aws_db_subnet_group.keycloak-database-subnet.*.name) : var.database_subnet_group
 }
 

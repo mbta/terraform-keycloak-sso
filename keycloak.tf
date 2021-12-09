@@ -1,4 +1,5 @@
 locals {
+  # get these values from either input variables, or internal resources if the variables weren't passed
   keycloak_image_url       = var.ecr_keycloak_image_url == null ? join("", aws_ecr_repository.keycloak-image-repository.*.repository_url) : var.ecr_keycloak_image_url
   keycloak_ecs_cluster_arn = var.ecs_cluster_arn == null ? join("", aws_ecs_cluster.keycloak-cluster.*.arn) : var.ecs_cluster_arn
 }
