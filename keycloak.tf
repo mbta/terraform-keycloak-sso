@@ -4,6 +4,7 @@ locals {
 }
 
 resource "aws_ecs_cluster" "keycloak-cluster" {
+  # only create this resource if ecs_cluster_arn is null
   count = var.ecs_cluster_arn == null ? 1 : 0
 
   name = "keycloak-${var.environment}-cluster"

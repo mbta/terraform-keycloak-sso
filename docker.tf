@@ -1,4 +1,5 @@
 resource "aws_ecr_repository" "keycloak-image-repository" {
+  # only create this resource if ecr_keycloak_image_url is null
   count = var.ecr_keycloak_image_url == null ? 1 : 0
 
   name                 = "keycloak"

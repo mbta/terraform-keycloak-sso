@@ -8,6 +8,7 @@ resource "random_password" "database-password" {
 }
 
 resource "aws_db_subnet_group" "keycloak-database-subnet" {
+  # only create this resource if database_subnet_group is null
   count = var.database_subnet_group == null ? 1 : 0
 
   name       = "keycloak-${var.environment}-database-subnet"
