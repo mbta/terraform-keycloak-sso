@@ -4,6 +4,12 @@ variable "acm_certificate_arn" {
   default     = null
 }
 
+variable "acm_hostname" {
+  type        = string
+  description = "(optional) DNS hostname of the Keycloak instance. Only needed if generating a certificate within this module"
+  default     = "keycloak.example.com"
+}
+
 variable "aws_region" {
   type        = string
   description = "AWS Region"
@@ -40,12 +46,6 @@ variable "ecs_cluster_arn" {
 variable "environment" {
   type        = string
   description = "Name of environment, e.g. 'dev', 'prod'"
-}
-
-variable "hostname" {
-  type        = string
-  description = "(optional) DNS hostname of the Keycloak instance. Only needed if generating a certificate within this module"
-  default     = "keycloak.example.com"
 }
 
 variable "kc_username" {

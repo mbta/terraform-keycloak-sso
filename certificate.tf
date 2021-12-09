@@ -14,7 +14,7 @@ resource "tls_self_signed_cert" "keycloak-certificate-body" {
   private_key_pem = join("", tls_private_key.keycloak-pk.*.private_key_pem)
 
   subject {
-    common_name  = var.hostname
+    common_name  = var.acm_hostname
     organization = var.organization
   }
 
