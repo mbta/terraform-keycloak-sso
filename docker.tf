@@ -9,9 +9,6 @@ resource "aws_ecr_repository" "keycloak-image-repository" {
     scan_on_push = true
   }
 
-  tags = {
-    project = "Keycloak"
-    Name    = "Integsoft Image repository"
-  }
+  tags = var.tags
 }
 

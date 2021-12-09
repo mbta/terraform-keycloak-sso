@@ -74,6 +74,12 @@ variable "public_subnets" {
   description = "List of public subnets in the VPC where Keycloak will reside"
 }
 
+variable "tags" {
+  type        = map(string)
+  description = "Map of tags to add to all resources. Defaults to `{ Project = 'Keycloak' }`"
+  default     = { Project = "Keycloak" }
+}
+
 variable "vpc_id" {
   type        = string
   description = "ID of an existing VPC where Keycloak will reside"

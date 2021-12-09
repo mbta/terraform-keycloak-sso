@@ -43,9 +43,6 @@ resource "aws_s3_bucket" "lb-access-logs" {
 }
 POLICY
 
-  tags = {
-    project = "Keycloak"
-    Name    = "Keycloak-LB-Logs"
-  }
+  tags = var.tags
 }
 

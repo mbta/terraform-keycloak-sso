@@ -33,4 +33,6 @@ resource "aws_acm_certificate" "keycloak-certificate" {
 
   private_key      = tls_private_key.keycloak-pk.*.private_key_pem
   certificate_body = tls_self_signed_cert.keycloak-certificate-body.*.cert_pem
+
+  tags = var.tags
 }

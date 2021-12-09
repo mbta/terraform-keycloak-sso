@@ -13,10 +13,7 @@ resource "aws_iam_role" "ecs-execution-task-role" {
   name               = "keycloak-${var.environment}-ecs-execution-task-role"
   assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
 
-  tags = {
-    project = "Keycloak"
-    Name    = "Keycloak-ECS-Exec-Role"
-  }
+  tags = var.tags
 }
 
 resource "aws_iam_role_policy_attachment" "ecs-execution-task-policy" {
@@ -44,9 +41,6 @@ resource "aws_iam_role" "keycloak-db-monitoring-role" {
 
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AmazonRDSEnhancedMonitoringRole"]
 
-  tags = {
-    project = "Keycloak"
-    Name    = "Keycloak-DB-Monitoring-Role"
-  }
+  tags = var.tags
 }
 

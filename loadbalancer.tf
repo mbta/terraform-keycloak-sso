@@ -24,10 +24,7 @@ resource "aws_security_group" "load-balancer-sg" {
     ipv6_cidr_blocks = ["::/0"]
   }
 
-  tags = {
-    project = "Keycloak"
-    Name    = "Keycloak-alb-sg"
-  }
+  tags = var.tags
 }
 
 resource "aws_alb" "application-load-balancer" {
@@ -44,10 +41,7 @@ resource "aws_alb" "application-load-balancer" {
     enabled = true
   }
 
-  tags = {
-    project = "Keycloak"
-    Name    = "Keycloak-alb"
-  }
+  tags = var.tags
 }
 
 resource "aws_lb_target_group" "target-group" {
@@ -72,10 +66,7 @@ resource "aws_lb_target_group" "target-group" {
     unhealthy_threshold = "2"
   }
 
-  tags = {
-    project = "Keycloak"
-    Name    = "Keycloak-lb-tg"
-  }
+  tags = var.tags
 }
 
 

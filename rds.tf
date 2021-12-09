@@ -15,10 +15,7 @@ resource "aws_db_subnet_group" "keycloak-database-subnet" {
   name       = "keycloak-${var.environment}-database-subnet"
   subnet_ids = var.private_subnets
 
-  tags = {
-    Name    = "Keycloak Database subnet"
-    project = "Keycloak"
-  }
+  tags = var.tags
 }
 
 resource "aws_security_group" "database-sg" {
@@ -40,10 +37,7 @@ resource "aws_security_group" "database-sg" {
     ipv6_cidr_blocks = ["::/0"]
   }
 
-  tags = {
-    project = "Keycloak"
-    Name    = "Database-sg"
-  }
+  tags = var.tags
 }
 
 resource "aws_db_parameter_group" "rds-mariadb-pg" {
@@ -60,10 +54,7 @@ resource "aws_db_parameter_group" "rds-mariadb-pg" {
     value = "utf8"
   }
 
-  tags = {
-    project = "Keycloak"
-    Name    = "Database-pg"
-  }
+  tags = var.tags
 }
 
 resource "aws_db_option_group" "rds-mariadb-og" {
@@ -81,10 +72,7 @@ resource "aws_db_option_group" "rds-mariadb-og" {
     }*/
   }
 
-  tags = {
-    project = "Keycloak"
-    Name    = "Database-pg"
-  }
+  tags = var.tags
 }
 
 resource "aws_db_instance" "keycloak-database-engine" {
@@ -115,10 +103,7 @@ resource "aws_db_instance" "keycloak-database-engine" {
     ]
   }
 
-  tags = {
-    project = "Keycloak"
-    Name    = "Keycloak Database"
-  }
+  tags = var.tags
 
   depends_on = [aws_db_option_group.rds-mariadb-og, aws_db_parameter_group.rds-mariadb-pg, aws_iam_role.keycloak-db-monitoring-role]
 }

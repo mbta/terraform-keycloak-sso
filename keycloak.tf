@@ -15,19 +15,14 @@ resource "aws_ecs_cluster" "keycloak-cluster" {
     value = "enabled"
   }
 
-  tags = {
-    project = "Keycloak"
-    Name    = "Keycloak ESC cluster"
-  }
+  tags = var.tags
 }
 
 resource "aws_cloudwatch_log_group" "keycloak-log-group" {
   name              = "keycloak-${var.environment}-logs"
   retention_in_days = 30
-  tags = {
-    project = "Keycloak"
-    Name    = "Keycloak CloudWatch"
-  }
+
+  tags = var.tags
 }
 
 
@@ -50,10 +45,7 @@ resource "aws_security_group" "keycloak-sg" {
     ipv6_cidr_blocks = ["::/0"]
   }
 
-  tags = {
-    project = "Keycloak"
-    Name    = "Keycloak-service-sg"
-  }
+  tags = var.tags
 }
 
 resource "aws_ecs_task_definition" "aws-ecs-keycloak-taskdef" {
@@ -118,10 +110,7 @@ resource "aws_ecs_task_definition" "aws-ecs-keycloak-taskdef" {
   execution_role_arn       = aws_iam_role.ecs-execution-task-role.arn
   task_role_arn            = aws_iam_role.ecs-execution-task-role.arn
 
-  tags = {
-    project = "Keycloak"
-    Name    = "keycloak-ecs-taskdef"
-  }
+  tags = var.tags
 }
 
 data "aws_ecs_task_definition" "main" {
