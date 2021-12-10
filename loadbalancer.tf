@@ -1,6 +1,12 @@
-resource "aws_security_group" "load-balancer-sg" {
-  vpc_id = aws_vpc.keycloak-vpc.id
-  name   = "load-balancer-sg"
+locals {
+  # get these values from either input variables, or internal resources if the variables weren't passed
+  certificate_arn = var.acm_certificate_arn == null ? join("", aws_acm_certificate.keycloak-certificate.*.arn) : var.acm_certificate_arn
+  lb_log_bucket   = var.lb_access_logs_s3_bucket == null ? join("", aws_s3_bucket.keycloak-lb-access-logs.*.id) : var.lb_access_logs_s3_bucket
+}
+
+resource "aws_security_group" "keycloak-load-balancer-sg" {
+  vpc_id = var.vpc_id
+  name   = "keycloak-${var.environment}-load-balancer-sg"
 
   ingress {
     from_port        = 443
@@ -18,44 +24,36 @@ resource "aws_security_group" "load-balancer-sg" {
     ipv6_cidr_blocks = ["::/0"]
   }
 
-  tags = {
-    project     = "MBTA-Keycloak"
-    Name        = "Keycloak-alb-sg"
-  }
+  tags = var.tags
 }
 
-resource "aws_alb" "application-load-balancer" {
-  name               = "keycloak-alb"
+resource "aws_alb" "keycloak-load-balancer" {
+  name               = "keycloak-${var.environment}-alb"
   internal           = false
   load_balancer_type = "application"
-  subnets            = aws_subnet.public.*.id
-  security_groups    = [aws_security_group.load-balancer-sg.id]
+  subnets            = var.public_subnets
+  security_groups    = [aws_security_group.keycloak-load-balancer-sg.id]
 
   # LB access logs
   access_logs {
-    bucket  = aws_s3_bucket.mbta-lb-access-logs.bucket
-    prefix  = "lb-keycloak"
+    bucket  = local.lb_log_bucket
+    prefix  = "keycloak-${var.environment}"
     enabled = true
   }
 
-  tags = {
-    project     = "MBTA-Keycloak"
-    Name        = "Keycloak-alb"
-  }
-
-  depends_on = [aws_s3_bucket.mbta-lb-access-logs]
+  tags = var.tags
 }
 
-resource "aws_lb_target_group" "target-group" {
-  name        = "keycloak-target-group"
+resource "aws_lb_target_group" "keycloak-target-group" {
+  name        = "keycloak-${var.environment}-target-group"
   port        = 8080
   protocol    = "HTTP"
   target_type = "ip"
-  vpc_id      = aws_vpc.keycloak-vpc.id
+  vpc_id      = var.vpc_id
 
   stickiness {
     enabled = true
-    type     = "lb_cookie"
+    type    = "lb_cookie"
   }
 
   health_check {
@@ -68,32 +66,19 @@ resource "aws_lb_target_group" "target-group" {
     unhealthy_threshold = "2"
   }
 
-  tags = {
-    project     = "MBTA-Keycloak"
-    Name        = "Keycloak-lb-tg"
-  }
+  tags = var.tags
 }
 
 
-resource "aws_lb_listener" "listener" {
-  load_balancer_arn = aws_alb.application-load-balancer.id
+resource "aws_lb_listener" "keycloak-listener" {
+  load_balancer_arn = aws_alb.keycloak-load-balancer.id
   port              = "443"
   protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = data.aws_acm_certificate.mbta.arn
+  ssl_policy        = "ELBSecurityPolicy-FS-1-2-Res-2020-10"
+  certificate_arn   = local.certificate_arn
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.target-group.id
+    target_group_arn = aws_lb_target_group.keycloak-target-group.id
   }
 }
-
-resource "aws_lb_listener_certificate" "keycloak-lb-certificate" {
-  listener_arn    = aws_lb_listener.listener.arn
-  certificate_arn = aws_acm_certificate.keycloak-certificate.arn
-}
-
-data "aws_lb" "keycloak-alb-ref" {
-  arn  = aws_alb.application-load-balancer.arn
-}
-

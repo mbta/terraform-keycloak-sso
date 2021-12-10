@@ -1,28 +1,24 @@
+variable "acm_certificate_arn" {
+  type        = string
+  description = "(optional) ARN of certificate for load balancer to use. Defaults to auto-creating a new certificate"
+  default     = null
+}
+
+variable "acm_hostname" {
+  type        = string
+  description = "(optional) DNS hostname of the Keycloak instance. Only needed if generating a certificate within this module"
+  default     = "keycloak.example.com"
+}
+
 variable "aws_region" {
   type        = string
   description = "AWS Region"
 }
 
-variable "ecr_keycloak_image_url" {
+variable "database_subnet_group" {
   type        = string
-  description = "ECR Keycloak Image location"
-}
-
-variable "log-bucket-owner-id" {
-  type        = string
-  description = "IAM id for the logs bucket owner (differs per region)"
-}
-
-variable "public_subnets" {
-  description = "List of public subnets"
-}
-
-variable "private_subnets" {
-  description = "List of private subnets"
-}
-
-variable "availability_zones" {
-  description = "List of availability zones"
+  description = "(optional) Name of a database subnet group where Keycloak MariaDB instance will reside. Defaults to creating a new subnet group containing var.private_subnets"
+  default     = null
 }
 
 variable "db_name" {
@@ -35,9 +31,21 @@ variable "db_username" {
   description = "Keycloak database username"
 }
 
-variable "db_password" {
+variable "ecr_keycloak_image_url" {
   type        = string
-  description = "Keycloak database user password"
+  description = "(optional) ECR Keycloak Image location. Defaults to creating a new ECR repo"
+  default     = null
+}
+
+variable "ecs_cluster_arn" {
+  type        = string
+  description = "(optional) ARN of an existing ECS cluster. Defaults to creating a new ECS cluster"
+  default     = null
+}
+
+variable "environment" {
+  type        = string
+  description = "Name of environment, e.g. 'dev', 'prod'"
 }
 
 variable "kc_username" {
@@ -45,8 +53,34 @@ variable "kc_username" {
   description = "Keycloak admin username"
 }
 
-variable "kc_password" {
+variable "lb_access_logs_s3_bucket" {
   type        = string
-  description = "Keycloak admin user password"
+  description = "(optional) Name of S3 bucket where logs will be stored. Defaults to creating a new S3 bucket"
+  default     = null
 }
 
+variable "organization" {
+  type        = string
+  description = "The name of the organization that owns this Keycloak instance"
+}
+
+variable "private_subnets" {
+  type        = list(string)
+  description = "List of private subnets in the VPC where Keycloak will reside"
+}
+
+variable "public_subnets" {
+  type        = list(string)
+  description = "List of public subnets in the VPC where Keycloak will reside"
+}
+
+variable "tags" {
+  type        = map(string)
+  description = "Map of tags to add to all resources. Defaults to `{ Project = 'Keycloak' }`"
+  default     = { Project = "Keycloak" }
+}
+
+variable "vpc_id" {
+  type        = string
+  description = "ID of an existing VPC where Keycloak will reside"
+}

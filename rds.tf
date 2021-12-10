@@ -1,22 +1,32 @@
-resource "aws_db_subnet_group" "keycloak-database-subnet" {
-  name       = "keycloak-database-subnet"
-  subnet_ids = aws_subnet.private.*.id
+locals {
+  # get this value from either input variables, or internal resources if the variables weren't passed
+  db_subnet_group = var.database_subnet_group == null ? join("", aws_db_subnet_group.keycloak-database-subnet.*.name) : var.database_subnet_group
+}
 
-  tags = {
-    Name     = "Keycloak Database subnet"
-    project  = "MBTA-Keycloak"
-  }
+resource "random_password" "database-password" {
+  length  = 32
+  special = false
+}
+
+resource "aws_db_subnet_group" "keycloak-database-subnet" {
+  # only create this resource if database_subnet_group is null
+  count = var.database_subnet_group == null ? 1 : 0
+
+  name       = "keycloak-${var.environment}-database-subnet"
+  subnet_ids = var.private_subnets
+
+  tags = var.tags
 }
 
 resource "aws_security_group" "database-sg" {
-  vpc_id = aws_vpc.keycloak-vpc.id
-  name   = "database-sg"
+  vpc_id = var.vpc_id
+  name   = "keycloak-${var.environment}-database-sg"
   ingress {
     description     = "MariaDB port"
     from_port       = 3306
     to_port         = 3306
     protocol        = "tcp"
-    cidr_blocks      = [aws_vpc.keycloak-vpc.cidr_block]
+    security_groups = [aws_security_group.keycloak-sg.id]
   }
 
   egress {
@@ -27,14 +37,11 @@ resource "aws_security_group" "database-sg" {
     ipv6_cidr_blocks = ["::/0"]
   }
 
-  tags = {
-    project = "MBTA-Keycloak"
-    Name        = "Database-sg"
-  }
+  tags = var.tags
 }
 
 resource "aws_db_parameter_group" "rds-mariadb-pg" {
-  name   = "rds-mariadb-pg"
+  name   = "rds-keycloak-${var.environment}-mariadb-pg"
   family = "mariadb10.5"
 
   parameter {
@@ -46,15 +53,12 @@ resource "aws_db_parameter_group" "rds-mariadb-pg" {
     name  = "character_set_client"
     value = "utf8"
   }
-  
-  tags = {
-    project = "MBTA-Keycloak"
-    Name    = "Database-pg"
-  }
+
+  tags = var.tags
 }
 
 resource "aws_db_option_group" "rds-mariadb-og" {
-  name                     = "rds-mariadb-og"
+  name                     = "rds-keycloak-${var.environment}-mariadb-og"
   option_group_description = "Terraform Option Group Maria DB"
   engine_name              = "mariadb"
   major_engine_version     = "10.5"
@@ -67,48 +71,39 @@ resource "aws_db_option_group" "rds-mariadb-og" {
       value = "ON"
     }*/
   }
-  
-  tags = {
-    project = "MBTA-Keycloak"
-    Name    = "Database-pg"
-  }
+
+  tags = var.tags
 }
 
 resource "aws_db_instance" "keycloak-database-engine" {
-  name                                  = "${var.db_name}"
-  identifier                            = "keycloak-database-engine"
-  allocated_storage                     = 20
-  max_allocated_storage                 = 100
-  engine                                = "mariadb"
-  engine_version                        = "10.5.12"
-  instance_class                        = "db.t2.micro"
-  db_subnet_group_name                  = "${aws_db_subnet_group.keycloak-database-subnet.name}"
-  multi_az                              = true
-  username                              = "${var.db_username}"
-  password                              = "${var.db_password}"
-  parameter_group_name                  = "rds-mariadb-pg"
-  option_group_name                     = "rds-mariadb-og"
-  vpc_security_group_ids                = [aws_security_group.database-sg.id]
-  skip_final_snapshot                   = true
-  monitoring_interval                   = 15
-  monitoring_role_arn                   = aws_iam_role.keycloak-db-monitoring-role.arn
+  name                   = var.db_name
+  identifier             = "keycloak-${var.environment}-database-engine"
+  allocated_storage      = 20
+  max_allocated_storage  = 100
+  engine                 = "mariadb"
+  engine_version         = "10.5.12"
+  instance_class         = "db.t2.micro"
+  db_subnet_group_name   = local.db_subnet_group
+  multi_az               = true
+  username               = var.db_username
+  parameter_group_name   = "rds-keycloak-${var.environment}-mariadb-pg"
+  option_group_name      = "rds-keycloak-${var.environment}-mariadb-og"
+  vpc_security_group_ids = [aws_security_group.database-sg.id]
+  skip_final_snapshot    = true
+  monitoring_interval    = 15
+  monitoring_role_arn    = aws_iam_role.keycloak-db-monitoring-role.arn
 
-  tags = {
-    project = "MBTA-Keycloak"
-    Name    = "Keycloak Database"
+  # this value leaks into state and thus should be changed on creation.
+  # any changes are ignored by the lifecycle policy below.
+  password = random_password.database-password.result
+
+  lifecycle {
+    ignore_changes = [
+      password,
+    ]
   }
-  
-  depends_on = [aws_db_option_group.rds-mariadb-og,aws_db_parameter_group.rds-mariadb-pg,aws_iam_role.keycloak-db-monitoring-role]
+
+  tags = var.tags
+
+  depends_on = [aws_db_option_group.rds-mariadb-og, aws_db_parameter_group.rds-mariadb-pg, aws_iam_role.keycloak-db-monitoring-role]
 }
-
-/*resource "aws_db_snapshot" "keycloak-db-snapshots" {
-  db_instance_identifier = aws_db_instance.keycloak-database-engine.id
-  db_snapshot_identifier = "keycloak-db-snapshot"
-}*/
-
-data "aws_db_instance" "database" {
-  db_instance_identifier = "keycloak-database-engine"
-  
-  depends_on = [aws_db_instance.keycloak-database-engine]
-}
-

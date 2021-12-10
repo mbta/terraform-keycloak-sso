@@ -1,37 +1,40 @@
+locals {
+  # get these values from either input variables, or internal resources if the variables weren't passed
+  keycloak_image_url       = var.ecr_keycloak_image_url == null ? join("", aws_ecr_repository.keycloak-image-repository.*.repository_url) : var.ecr_keycloak_image_url
+  keycloak_ecs_cluster_arn = var.ecs_cluster_arn == null ? join("", aws_ecs_cluster.keycloak-cluster.*.arn) : var.ecs_cluster_arn
+}
+
 resource "aws_ecs_cluster" "keycloak-cluster" {
-  name = "keycloak-cluster"
+  # only create this resource if ecs_cluster_arn is null
+  count = var.ecs_cluster_arn == null ? 1 : 0
+
+  name = "keycloak-${var.environment}-cluster"
 
   setting {
     name  = "containerInsights"
     value = "enabled"
   }
-  
-  tags = {
-     project = "MBTA-Keycloak"
-     Name    = "Keycloak ESC cluster"
-  }
+
+  tags = var.tags
 }
 
 resource "aws_cloudwatch_log_group" "keycloak-log-group" {
-  name              = "keycloak-logs"
+  name              = "keycloak-${var.environment}-logs"
   retention_in_days = 30
-  tags = {
-    project = "MBTA-Keycloak"
-    Name    = "Keycloak CloudWatch"
-  }
+
+  tags = var.tags
 }
 
 
 resource "aws_security_group" "keycloak-sg" {
-  vpc_id = aws_vpc.keycloak-vpc.id
-  name   = "keycloak-sg"
+  vpc_id = var.vpc_id
+  name   = "keycloak-${var.environment}-sg"
 
   ingress {
     from_port       = 0
     to_port         = 0
     protocol        = "-1"
-    cidr_blocks      = ["10.10.0.0/16"]
-    #security_groups = [aws_security_group.load-balancer-sg.id]
+    security_groups = [aws_security_group.keycloak-load-balancer-sg.id]
   }
 
   egress {
@@ -42,38 +45,37 @@ resource "aws_security_group" "keycloak-sg" {
     ipv6_cidr_blocks = ["::/0"]
   }
 
-  tags = {
-    project = "MBTA-Keycloak"
-    Name        = "Keycloak-service-sg"
-  }
+  tags = var.tags
 }
 
-resource "aws_ecs_task_definition" "aws-ecs-keycloak-taskdef" {
-  family = "keycloak-task"
+resource "aws_ecs_task_definition" "keycloak-ecs-taskdef" {
+  family = "keycloak-${var.environment}-task"
 
   container_definitions = <<DEFINITION
   [
     {
-      "name": "keycloak",
-      "image": "${var.ecr_keycloak_image_url}:latest",
+      "name": "keycloak-${var.environment}",
+      "image": "${local.keycloak_image_url}:latest",
       "entryPoint": [],
       "environment": [
         {"name":"KEYCLOAK_USER", "value":"${var.kc_username}"},
-        {"name":"KEYCLOAK_PASSWORD", "value":"${var.kc_password}"},
         {"name":"PROXY_ADDRESS_FORWARDING", "value":"true"},
         {"name":"KEYCLOAK_LOGLEVEL", "value":"INFO"},
         {"name":"ROOT_LOGLEVEL", "value":"INFO"},
         {"name":"DB_VENDOR", "value":"mariadb"},
-        {"name":"DB_ADDR", "value":"${data.aws_db_instance.database.endpoint}"},
+        {"name":"DB_ADDR", "value":"${aws_db_instance.keycloak-database-engine.endpoint}"},
         {"name":"DB_DATABASE", "value":"${var.db_name}"},
         {"name":"DB_USER", "value":"${var.db_username}"},
-        {"name":"DB_PASSWORD", "value":"${var.db_password}"},
         {"name":"JDBC_PARAMS", "value":"autoReconnect=true"},
         {"name":"JAVA_OPTS_APPEND", "value":"-Xmx1500m"},
         {"name":"JGROUPS_DISCOVERY_PROTOCOL", "value":"JDBC_PING"},
         {"name":"JGROUPS_DISCOVERY_PROPERTIES", "value":"datasource_jndi_name=java:jboss/datasources/KeycloakDS,remove_old_coords_on_view_change=true"},
         {"name":"CACHE_OWNERS_COUNT", "value":"2"},
         {"name":"CACHE_OWNERS_AUTH_SESSIONS_COUNT", "value":"2"}
+      ],
+      "secrets": [
+        {"name":"KEYCLOAK_PASSWORD", "valueFrom":"${aws_secretsmanager_secret.keycloak-admin-password.arn}"},
+        {"name":"DB_PASSWORD", "valueFrom":"${aws_secretsmanager_secret.keycloak-database-password.arn}"}
       ],
       "essential": true,
       "logConfiguration": {
@@ -105,44 +107,36 @@ resource "aws_ecs_task_definition" "aws-ecs-keycloak-taskdef" {
   network_mode             = "awsvpc"
   memory                   = "2048"
   cpu                      = "512"
-  execution_role_arn       = aws_iam_role.ecs-execution-task-role.arn
-  task_role_arn            = aws_iam_role.ecs-execution-task-role.arn
+  execution_role_arn       = aws_iam_role.keycloak-ecs-execution-task-role.arn
+  task_role_arn            = aws_iam_role.keycloak-ecs-execution-task-role.arn
 
-  tags = {
-    project = "MBTA-Keycloak"
-    Name        = "keycloak-ecs-taskdef"
-  }
+  tags = var.tags
 }
-
-data "aws_ecs_task_definition" "main" {
-  task_definition = aws_ecs_task_definition.aws-ecs-keycloak-taskdef.family
-}
-
 
 resource "aws_ecs_service" "keycloak-service" {
-  name                 = "keycloak-service"
-  cluster              = aws_ecs_cluster.keycloak-cluster.id
-  task_definition      = "${aws_ecs_task_definition.aws-ecs-keycloak-taskdef.family}:${max(aws_ecs_task_definition.aws-ecs-keycloak-taskdef.revision, data.aws_ecs_task_definition.main.revision)}"
+  name                 = "keycloak-${var.environment}-service"
+  cluster              = local.keycloak_ecs_cluster_arn
+  task_definition      = aws_ecs_task_definition.keycloak-ecs-taskdef.arn
   launch_type          = "FARGATE"
   scheduling_strategy  = "REPLICA"
   desired_count        = 2
   force_new_deployment = true
 
   network_configuration {
-    subnets          = aws_subnet.private.*.id
+    subnets          = var.private_subnets
     assign_public_ip = false
     security_groups = [
       aws_security_group.keycloak-sg.id,
-      aws_security_group.load-balancer-sg.id
+      aws_security_group.keycloak-load-balancer-sg.id
     ]
   }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.target-group.arn
-    container_name   = "keycloak"
+    target_group_arn = aws_lb_target_group.keycloak-target-group.arn
+    container_name   = "keycloak-${var.environment}"
     container_port   = 8080
   }
 
-  depends_on = [aws_lb_listener.listener,aws_iam_role.ecs-execution-task-role,aws_db_instance.keycloak-database-engine]
+  depends_on = [aws_lb_listener.keycloak-listener, aws_iam_role.keycloak-ecs-execution-task-role, aws_db_instance.keycloak-database-engine]
 }
 

@@ -1,6 +1,9 @@
-resource "aws_s3_bucket" "mbta-lb-access-logs" {
+resource "aws_s3_bucket" "keycloak-lb-access-logs" {
+  # only create this resource if lb_access_logs_s3_bucket is null
+  count = var.lb_access_logs_s3_bucket == null ? 1 : 0
+
   acl           = "private"
-  bucket        = "mbta-lb-access-logs"
+  bucket        = "${lower(var.organization)}-keycloak-${var.environment}-lb-access-logs"
   force_destroy = true
 
   policy = <<POLICY
@@ -10,10 +13,10 @@ resource "aws_s3_bucket" "mbta-lb-access-logs" {
      {
         "Effect": "Allow",
         "Principal": {
-          "AWS": "arn:aws:iam::${var.log-bucket-owner-id}:root"
+          "AWS": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
         },
         "Action": "s3:PutObject",
-        "Resource": "arn:aws:s3:::mbta-lb-access-logs/*"
+        "Resource": "arn:aws:s3:::${lower(var.organization)}-keycloak-${var.environment}-lb-access-logs/*"
       },
       {
         "Effect": "Allow",
@@ -21,7 +24,7 @@ resource "aws_s3_bucket" "mbta-lb-access-logs" {
           "Service": "delivery.logs.amazonaws.com"
         },
         "Action": "s3:PutObject",
-        "Resource": "arn:aws:s3:::mbta-lb-access-logs/*",
+        "Resource": "arn:aws:s3:::${lower(var.organization)}-keycloak-${var.environment}-lb-access-logs/*",
         "Condition": {
           "StringEquals": {
             "s3:x-amz-acl": "bucket-owner-full-control"
@@ -34,15 +37,12 @@ resource "aws_s3_bucket" "mbta-lb-access-logs" {
           "Service": "delivery.logs.amazonaws.com"
         },
         "Action": "s3:GetBucketAcl",
-        "Resource": "arn:aws:s3:::mbta-lb-access-logs"
+        "Resource": "arn:aws:s3:::${lower(var.organization)}-keycloak-${var.environment}-lb-access-logs"
       }
     ]
 }
 POLICY
-  
-  tags = {
-    project     = "MBTA-Keycloak"
-    Name        = "Keycloak-LB-Logs"
-  }
+
+  tags = var.tags
 }
 
