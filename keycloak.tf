@@ -55,7 +55,7 @@ resource "aws_ecs_task_definition" "keycloak-ecs-taskdef" {
   [
     {
       "name": "keycloak-${var.environment}",
-      "image": "${local.keycloak_image_url}:latest",
+      "image": "${local.keycloak_image_url}:${var.ecr_keycloak_image_tag}",
       "entryPoint": [],
       "environment": [
         {"name":"KEYCLOAK_USER", "value":"${var.kc_username}"},

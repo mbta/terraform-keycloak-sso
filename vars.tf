@@ -37,6 +37,12 @@ variable "ecr_keycloak_image_url" {
   default     = null
 }
 
+variable "ecr_keycloak_image_tag" {
+  type        = string
+  description = "(optional) ECR Keycloak image tag. Defaults to 'latest'"
+  default     = "latest"
+}
+
 variable "ecs_cluster_arn" {
   type        = string
   description = "(optional) ARN of an existing ECS cluster. Defaults to creating a new ECS cluster"
