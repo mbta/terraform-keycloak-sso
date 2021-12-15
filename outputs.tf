@@ -5,3 +5,7 @@ output "rds_endpoint" {
 output "alb_endpoint" {
   value = aws_alb.keycloak-load-balancer.dns_name
 }
+
+output "alb_zone_id" {
+  value = aws_alb.keycloak-load-balancer.zone_id
+}
