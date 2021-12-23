@@ -10,6 +10,12 @@ variable "acm_hostname" {
   default     = "keycloak.example.com"
 }
 
+variable "autoscale" {
+  description = "Autoscaling block"
+  type        = map(string)
+  default     = {}
+}
+
 variable "aws_region" {
   type        = string
   description = "AWS Region"
