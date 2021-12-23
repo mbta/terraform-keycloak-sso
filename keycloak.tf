@@ -1,14 +1,21 @@
 locals {
   # get these values from either input variables, or internal resources if the variables weren't passed
-  keycloak_image_url       = var.ecr_keycloak_image_url == null ? join("", aws_ecr_repository.keycloak-image-repository.*.repository_url) : var.ecr_keycloak_image_url
-  keycloak_ecs_cluster_arn = var.ecs_cluster_arn == null ? join("", aws_ecs_cluster.keycloak-cluster.*.arn) : var.ecs_cluster_arn
+  keycloak_image_url        = var.ecr_keycloak_image_url == null ? join("", aws_ecr_repository.keycloak-image-repository.*.repository_url) : var.ecr_keycloak_image_url
+  keycloak_ecs_cluster_name = var.ecs_cluster_name == null ? "keycloak-${var.environment}-cluster" : var.ecs_cluster_name
+  keycloak_ecs_cluster_arn  = var.ecs_cluster_name == null ? join("", aws_ecs_cluster.keycloak-cluster.*.arn) : join("", data.aws_ecs_cluster.keycloak-cluster.*.arn)
+}
+
+data "aws_ecs_cluster" "keycloak-cluster" {
+  count = var.ecs_cluster_name != null ? 1 : 0
+
+  cluster_name = var.ecs_cluster_name
 }
 
 resource "aws_ecs_cluster" "keycloak-cluster" {
   # only create this resource if ecs_cluster_arn is null
-  count = var.ecs_cluster_arn == null ? 1 : 0
+  count = var.ecs_cluster_name == null ? 1 : 0
 
-  name = "keycloak-${var.environment}-cluster"
+  name = local.keycloak_ecs_cluster_name
 
   setting {
     name  = "containerInsights"
