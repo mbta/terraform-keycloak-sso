@@ -10,6 +10,12 @@ variable "acm_hostname" {
   default     = "keycloak.example.com"
 }
 
+variable "autoscale" {
+  description = "Autoscaling block"
+  type        = map(string)
+  default     = {}
+}
+
 variable "aws_region" {
   type        = string
   description = "AWS Region"
@@ -43,9 +49,9 @@ variable "ecr_keycloak_image_tag" {
   default     = "latest"
 }
 
-variable "ecs_cluster_arn" {
+variable "ecs_cluster_name" {
   type        = string
-  description = "(optional) ARN of an existing ECS cluster. Defaults to creating a new ECS cluster"
+  description = "(optional) Name of an existing ECS cluster. Defaults to creating a new ECS cluster with the name 'keycloak-$${var.environment}-cluster'"
   default     = null
 }
 
