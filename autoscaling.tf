@@ -68,7 +68,7 @@ resource "aws_cloudwatch_metric_alarm" "keycloak-alarm-scale-up" {
 resource "aws_appautoscaling_target" "keycloak-ecs-target" {
   max_capacity       = lookup(var.autoscale, "autoscale_max_capacity", 4)
   min_capacity       = lookup(var.autoscale, "service_desired_count", 2)
-  resource_id        = "service/keycloak-cluster/keycloak-service"
+  resource_id        = "service/${local.keycloak_ecs_cluster_name}/${aws_ecs_service.keycloak-service.name}"
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
   role_arn           = aws_iam_role.keycloak-ecs-autoscale-role.arn
