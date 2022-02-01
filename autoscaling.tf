@@ -1,28 +1,3 @@
-resource "aws_iam_role" "keycloak-ecs-autoscale-role" {
-  name = "keycloak-ecs-scale-application"
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "application-autoscaling.amazonaws.com"
-      },
-      "Effect": "Allow"
-    }
-  ]
-}
-EOF
-}
-
-resource "aws_iam_role_policy_attachment" "keycloak-ecs-autoscale" {
-  role       = aws_iam_role.keycloak-ecs-autoscale-role.id
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceAutoscaleRole"
-}
-
-
 # CLOUDWATCH ALARM to monitor the memory utilization of a service
 resource "aws_cloudwatch_metric_alarm" "keycloak-alarm-scale-down" {
   alarm_description = "Scale down alarm for keycloak-service"
@@ -71,7 +46,6 @@ resource "aws_appautoscaling_target" "keycloak-ecs-target" {
   resource_id        = "service/${local.keycloak_ecs_cluster_name}/${aws_ecs_service.keycloak-service.name}"
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
-  role_arn           = aws_iam_role.keycloak-ecs-autoscale-role.arn
 }
 
 # Set up the memory utilization policy for scale down when the cloudwatch alarm gets triggered.
