@@ -6,7 +6,7 @@ data "aws_iam_policy_document" "keycloak-ses-sender" {
 }
 
 resource "aws_iam_policy" "keycloak-ses-sender" {
-  name        = "keycloak-ses-sender"
+  name        = "keycloak-${var.environment}-ses-sender"
   description = "Allows sending of e-mails via Simple Email Service"
   policy      = data.aws_iam_policy_document.keycloak-ses-sender.json
 }
