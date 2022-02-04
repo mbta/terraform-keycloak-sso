@@ -2,7 +2,7 @@
 resource "aws_cloudwatch_metric_alarm" "keycloak-alarm-scale-down" {
   alarm_description = "Scale down alarm for keycloak-service"
   namespace         = "AWS/ECS"
-  alarm_name        = "keycloak-service-down"
+  alarm_name        = "keycloak-${var.environment}-service-down"
   alarm_actions     = [aws_appautoscaling_policy.keycloak-policy-scale-down.arn]
 
   comparison_operator = var.autoscale["scale_down_comparison_operator"]
@@ -23,7 +23,7 @@ resource "aws_cloudwatch_metric_alarm" "keycloak-alarm-scale-down" {
 resource "aws_cloudwatch_metric_alarm" "keycloak-alarm-scale-up" {
   alarm_description = "Scale up alarm for keycloak-service"
   namespace         = "AWS/ECS"
-  alarm_name        = "keycloak-service-up"
+  alarm_name        = "keycloak-${var.environment}-service-up"
   alarm_actions     = [aws_appautoscaling_policy.keycloak-policy-scale-up.arn]
 
   comparison_operator = var.autoscale["scale_up_comparison_operator"]
@@ -50,7 +50,7 @@ resource "aws_appautoscaling_target" "keycloak-ecs-target" {
 
 # Set up the memory utilization policy for scale down when the cloudwatch alarm gets triggered.
 resource "aws_appautoscaling_policy" "keycloak-policy-scale-down" {
-  name               = "keycloak-service-down"
+  name               = "keycloak-${var.environment}-service-down"
   resource_id        = aws_appautoscaling_target.keycloak-ecs-target.resource_id
   scalable_dimension = aws_appautoscaling_target.keycloak-ecs-target.scalable_dimension
   service_namespace  = aws_appautoscaling_target.keycloak-ecs-target.service_namespace
@@ -69,7 +69,7 @@ resource "aws_appautoscaling_policy" "keycloak-policy-scale-down" {
 
 # Set up the memory utilization policy for scale up when the cloudwatch alarm gets triggered.
 resource "aws_appautoscaling_policy" "keycloak-policy-scale-up" {
-  name               = "keycloak-service-up"
+  name               = "keycloak-${var.environment}-service-up"
   resource_id        = aws_appautoscaling_target.keycloak-ecs-target.resource_id
   scalable_dimension = aws_appautoscaling_target.keycloak-ecs-target.scalable_dimension
   service_namespace  = aws_appautoscaling_target.keycloak-ecs-target.service_namespace
