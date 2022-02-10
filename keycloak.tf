@@ -56,7 +56,7 @@ resource "aws_security_group" "keycloak-sg" {
 }
 
 resource "aws_ecs_task_definition" "keycloak-ecs-taskdef" {
-  family = "keycloak-${var.environment}-task"
+  family = "keycloak-${var.environment}-template"
 
   container_definitions = <<DEFINITION
   [
@@ -118,6 +118,10 @@ resource "aws_ecs_task_definition" "keycloak-ecs-taskdef" {
   task_role_arn            = aws_iam_role.keycloak-ecs-execution-task-role.arn
 
   tags = var.tags
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_ecs_service" "keycloak-service" {
@@ -142,6 +146,13 @@ resource "aws_ecs_service" "keycloak-service" {
     target_group_arn = aws_lb_target_group.keycloak-target-group.arn
     container_name   = "keycloak-${var.environment}"
     container_port   = 8080
+  }
+
+  lifecycle {
+    ignore_changes = [
+      desired_count,
+      task_definition,
+    ]
   }
 
   depends_on = [aws_lb_listener.keycloak-listener, aws_iam_role.keycloak-ecs-execution-task-role, aws_db_instance.keycloak-database-engine]
