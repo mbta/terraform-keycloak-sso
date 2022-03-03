@@ -149,6 +149,7 @@ resource "aws_ecs_service" "keycloak-service" {
   }
 
   lifecycle {
+    create_before_destroy = true
     ignore_changes = [
       desired_count,
       task_definition,
