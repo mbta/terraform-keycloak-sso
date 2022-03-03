@@ -125,7 +125,7 @@ resource "aws_ecs_task_definition" "keycloak-ecs-taskdef" {
 }
 
 resource "aws_ecs_service" "keycloak-service" {
-  name                 = "keycloak-${var.environment}-service"
+  name                 = "keycloak-${var.environment}"
   cluster              = local.keycloak_ecs_cluster_arn
   task_definition      = aws_ecs_task_definition.keycloak-ecs-taskdef.arn
   launch_type          = "FARGATE"
