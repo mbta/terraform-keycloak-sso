@@ -56,9 +56,12 @@ data "aws_iam_policy_document" "inline-keycloak-secretsmanager-doc" {
   statement {
     actions = ["secretsmanager:GetSecretValue"]
     effect  = "Allow"
-    resources = [
-      aws_secretsmanager_secret.keycloak-admin-password.arn,
-      aws_secretsmanager_secret.keycloak-database-password.arn,
-    ]
+    resources = concat(
+      [
+        aws_secretsmanager_secret.keycloak-admin-password.arn,
+        aws_secretsmanager_secret.keycloak-database-password.arn,
+      ],
+      aws_secretsmanager_secret.keycloak-splunk-token.*.arn
+    )
   }
 }

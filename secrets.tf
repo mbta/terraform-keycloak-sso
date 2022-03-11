@@ -9,3 +9,13 @@ resource "aws_secretsmanager_secret" "keycloak-database-password" {
 
   tags = var.tags
 }
+
+# if log driver is Splunk, also create Splunk token secret
+resource "aws_secretsmanager_secret" "keycloak-splunk-token" {
+  count = var.log_driver == "splunk" ? 1 : 0
+
+  name        = "keycloak-splunk-token"
+  description = "Keycloak Splunk HTTP Event Collector token"
+
+  tags = var.tags
+}
