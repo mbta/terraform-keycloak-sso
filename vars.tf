@@ -98,6 +98,12 @@ variable "splunk_http_endpoint" {
   default     = null
 }
 
+variable "splunk_token_secret_arn" {
+  type        = string
+  description = "(optional) The ARN of a Secrets Manager secret containing the Splunk token. Only required if log_driver is 'splunk' and you wish to use an existing Secrets Manager resource instead of having the module create one"
+  default     = null
+}
+
 variable "tags" {
   type        = map(string)
   description = "Map of tags to add to all resources. Defaults to `{ Project = 'Keycloak' }`"

@@ -20,7 +20,7 @@ locals {
       secretOptions = [
         {
           name      = "splunk-token",
-          valueFrom = join("", aws_secretsmanager_secret.keycloak-splunk-token.*.arn)
+          valueFrom = local.keycloak_splunk_token_secret_arn
         }
       ]
     }
