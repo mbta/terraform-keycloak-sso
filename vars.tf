@@ -71,6 +71,12 @@ variable "lb_access_logs_s3_bucket" {
   default     = null
 }
 
+variable "log_driver" {
+  type        = string
+  description = "(optional) ECS log driver for task log configuration. Supported options are 'awslogs' and 'splunk'"
+  default     = "awslogs"
+}
+
 variable "organization" {
   type        = string
   description = "The name of the organization that owns this Keycloak instance"
@@ -84,6 +90,18 @@ variable "private_subnets" {
 variable "public_subnets" {
   type        = list(string)
   description = "List of public subnets in the VPC where Keycloak will reside"
+}
+
+variable "splunk_http_endpoint" {
+  type        = string
+  description = "(optional) The Splunk HTTP endpoint to send logs to. Only required if log_driver is 'splunk'"
+  default     = null
+}
+
+variable "splunk_token_secret_arn" {
+  type        = string
+  description = "(optional) The ARN of a Secrets Manager secret containing the Splunk token. Only required if log_driver is 'splunk' and you wish to use an existing Secrets Manager resource instead of having the module create one"
+  default     = null
 }
 
 variable "tags" {

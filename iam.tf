@@ -1,3 +1,7 @@
+locals {
+  splunk_token_secret_arn_list = var.log_driver == "splunk" ? [local.keycloak_splunk_token_secret_arn] : []
+}
+
 data "aws_iam_policy_document" "assume_role_policy" {
   statement {
     actions = ["sts:AssumeRole"]
@@ -56,9 +60,12 @@ data "aws_iam_policy_document" "inline-keycloak-secretsmanager-doc" {
   statement {
     actions = ["secretsmanager:GetSecretValue"]
     effect  = "Allow"
-    resources = [
-      aws_secretsmanager_secret.keycloak-admin-password.arn,
-      aws_secretsmanager_secret.keycloak-database-password.arn,
-    ]
+    resources = concat(
+      [
+        aws_secretsmanager_secret.keycloak-admin-password.arn,
+        aws_secretsmanager_secret.keycloak-database-password.arn,
+      ],
+      local.splunk_token_secret_arn_list
+    )
   }
 }

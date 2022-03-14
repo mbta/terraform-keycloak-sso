@@ -25,14 +25,6 @@ resource "aws_ecs_cluster" "keycloak-cluster" {
   tags = var.tags
 }
 
-resource "aws_cloudwatch_log_group" "keycloak-log-group" {
-  name              = "keycloak-${var.environment}-logs"
-  retention_in_days = 30
-
-  tags = var.tags
-}
-
-
 resource "aws_security_group" "keycloak-sg" {
   vpc_id = var.vpc_id
   name   = "keycloak-${var.environment}-sg"
@@ -85,14 +77,7 @@ resource "aws_ecs_task_definition" "keycloak-ecs-taskdef" {
         {"name":"DB_PASSWORD", "valueFrom":"${aws_secretsmanager_secret.keycloak-database-password.arn}"}
       ],
       "essential": true,
-      "logConfiguration": {
-        "logDriver": "awslogs",
-        "options": {
-          "awslogs-group": "${aws_cloudwatch_log_group.keycloak-log-group.id}",
-          "awslogs-region": "${var.aws_region}",
-          "awslogs-stream-prefix": "log"
-        }
-      },
+      "logConfiguration": ${local.log_configuration},
       "portMappings": [
         {
           "containerPort": 8080,
