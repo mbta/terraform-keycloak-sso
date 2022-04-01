@@ -51,7 +51,6 @@ resource "aws_lb_target_group" "keycloak-target-group" {
   target_type = "ip"
   vpc_id      = var.vpc_id
 
-  slow_start           = 300
   deregistration_delay = 15
 
   stickiness {

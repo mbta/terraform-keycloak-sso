@@ -118,6 +118,8 @@ resource "aws_ecs_service" "keycloak-service" {
   desired_count        = 2
   force_new_deployment = true
 
+  health_check_grace_period_seconds = 30
+
   network_configuration {
     subnets          = var.private_subnets
     assign_public_ip = false
