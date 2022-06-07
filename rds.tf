@@ -76,7 +76,7 @@ resource "aws_db_option_group" "rds-mariadb-og" {
 }
 
 resource "aws_db_instance" "keycloak-database-engine" {
-  name                   = var.db_name
+  db_name                   = var.db_name
   identifier             = "keycloak-${var.environment}"
   allocated_storage      = 20
   max_allocated_storage  = 100
