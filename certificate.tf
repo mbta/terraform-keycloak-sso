@@ -10,7 +10,6 @@ resource "tls_self_signed_cert" "keycloak-certificate-body" {
   # only create this resource if acm_certificate_arn is null
   count = var.acm_certificate_arn == null ? 1 : 0
 
-  key_algorithm   = "RSA"
   private_key_pem = join("", tls_private_key.keycloak-pk.*.private_key_pem)
 
   subject {
