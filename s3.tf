@@ -1,6 +1,6 @@
 resource "aws_s3_bucket" "keycloak-lb-access-logs" {
-  # only create this resource if lb_access_logs_s3_bucket is null
-  count = var.lb_access_logs_s3_bucket == null ? 1 : 0
+  # only create this resource if lb_enable_access_logs is true and lb_access_logs_s3_bucket is null
+  count = var.lb_enable_access_logs == true && var.lb_access_logs_s3_bucket == null ? 1 : 0
 
   bucket        = "${lower(var.organization)}-keycloak-${var.environment}-lb-access-logs"
   force_destroy = true
@@ -9,16 +9,16 @@ resource "aws_s3_bucket" "keycloak-lb-access-logs" {
 }
 
 resource "aws_s3_bucket_acl" "keycloak-lb-access-logs" {
-  # only create this resource if lb_access_logs_s3_bucket is null
-  count = var.lb_access_logs_s3_bucket == null ? 1 : 0
+  # only create this resource if lb_enable_access_logs is true and lb_access_logs_s3_bucket is null
+  count = var.lb_enable_access_logs == true && var.lb_access_logs_s3_bucket == null ? 1 : 0
 
   bucket = aws_s3_bucket.keycloak-lb-access-logs[0].id
   acl    = "private"
 }
 
 resource "aws_s3_bucket_policy" "keycloak-lb-access-logs" {
-  # only create this resource if lb_access_logs_s3_bucket is null
-  count = var.lb_access_logs_s3_bucket == null ? 1 : 0
+  # only create this resource if lb_enable_access_logs is true and lb_access_logs_s3_bucket is null
+  count = var.lb_enable_access_logs == true && var.lb_access_logs_s3_bucket == null ? 1 : 0
 
   bucket = aws_s3_bucket.keycloak-lb-access-logs[0].id
 

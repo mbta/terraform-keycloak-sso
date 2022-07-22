@@ -65,9 +65,15 @@ variable "kc_username" {
   description = "Keycloak admin username"
 }
 
+variable "lb_enable_access_logs" {
+  type        = bool
+  description = "Whether to enable access logging to S3"
+  default     = false
+}
+
 variable "lb_access_logs_s3_bucket" {
   type        = string
-  description = "(optional) Name of S3 bucket where logs will be stored. Defaults to creating a new S3 bucket"
+  description = "(optional) Name of S3 bucket where logs will be stored. Defaults to creating a new S3 bucket if lb_enable_access_logs is enabled"
   default     = null
 }
 

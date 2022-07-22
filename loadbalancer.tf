@@ -35,10 +35,15 @@ resource "aws_alb" "keycloak-load-balancer" {
   security_groups    = [aws_security_group.keycloak-load-balancer-sg.id]
 
   # LB access logs
-  access_logs {
-    bucket  = local.lb_log_bucket
-    prefix  = "keycloak-${var.environment}"
-    enabled = true
+  dynamic "access_logs" {
+    # only include this block if var.lb_enable_access_logs is true
+    for_each = var.lb_enable_access_logs == true ? toset([1]) : toset([])
+
+    content {
+      bucket  = local.lb_log_bucket
+      prefix  = "keycloak-${var.environment}"
+      enabled = var.lb_enable_access_logs
+    }
   }
 
   tags = var.tags
