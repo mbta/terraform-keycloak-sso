@@ -68,7 +68,7 @@ variable "kc_username" {
 variable "lb_enable_access_logs" {
   type        = bool
   description = "Whether to enable access logging to S3"
-  default     = false
+  default     = true
 }
 
 variable "lb_access_logs_s3_bucket" {
