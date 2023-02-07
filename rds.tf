@@ -82,7 +82,7 @@ resource "aws_db_instance" "keycloak-database-engine" {
   max_allocated_storage  = 100
   engine                 = "mariadb"
   engine_version         = "10.5.12"
-  instance_class         = "db.t2.micro"
+  instance_class         = "db.t3.micro"
   db_subnet_group_name   = local.db_subnet_group
   multi_az               = true
   username               = var.db_username
