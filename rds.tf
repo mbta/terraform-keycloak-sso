@@ -92,6 +92,7 @@ resource "aws_db_instance" "keycloak-database-engine" {
   skip_final_snapshot    = true
   monitoring_interval    = 15
   monitoring_role_arn    = aws_iam_role.keycloak-db-monitoring-role.arn
+  storage_encrypted      = true
 
   # this value leaks into state and thus should be changed on creation.
   # any changes are ignored by the lifecycle policy below.
