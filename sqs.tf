@@ -18,7 +18,10 @@ data "aws_iam_policy_document" "keycloak_to_alerts_concierge_user_updates_publis
   statement {
     sid = "AllowSendFromKeycloak"
     effect = "Allow"
-    actions = ["sqs:SendMessage"]
+    actions = [
+      "sqs:GetQueueUrl",
+      "sqs:SendMessage"
+    ]
     resources = [
       aws_sqs_queue.keycloak_to_alerts_concierge_user_updates.arn
     ]
