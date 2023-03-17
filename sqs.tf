@@ -4,10 +4,6 @@ resource "aws_sqs_queue" "keycloak_to_alerts_concierge_user_updates" {
 }
 
 # allow Keycloak to publish messages to SQS
-resource "aws_sqs_queue_policy" "keycloak_to_alerts_concierge_user_updates" {
-  queue_url = aws_sqs_queue.keycloak_to_alerts_concierge_user_updates.id
-  policy    = data.aws_iam_policy_document.keycloak_to_alerts_concierge_user_updates.json
-}
 resource "aws_iam_role_policy" "keycloak_to_alerts_concierge_user_updates_publish" {
   name   = "keycloak-${var.environment}-alerts-concierge-user-updates-publish"
   role   = resource.keycloak-service.keycloak-service.id
