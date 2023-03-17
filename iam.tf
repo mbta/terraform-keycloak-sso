@@ -73,7 +73,7 @@ data "aws_iam_policy_document" "inline-keycloak-secretsmanager-doc" {
 # allow Keycloak to publish messages to SQS
 resource "aws_iam_role_policy" "keycloak_to_alerts_concierge_user_updates_publish" {
   name   = "keycloak-${var.environment}-alerts-concierge-user-updates-publish"
-  role   = resource.keycloak-service.keycloak-service.id
+  role   = aws_iam_role.keycloak-ecs-execution-task-role.name
   policy = data.aws_iam_policy_document.keycloak_to_alerts_concierge_user_updates_publish.json
 }
 
