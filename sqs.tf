@@ -25,7 +25,7 @@ data "aws_iam_policy_document" "keycloak_to_alerts_concierge_user_updates_policy
     condition {
       test     = "ArnEquals"
       variable = "aws:SourceArn"
-      values   = [aws_ecs_task_definition.keycloak-ecs-taskdef.arn]
+      values   = [aws_iam_role.keycloak-ecs-execution-task-role.arn]
     }
   }
 }
