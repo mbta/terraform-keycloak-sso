@@ -69,3 +69,22 @@ data "aws_iam_policy_document" "inline-keycloak-secretsmanager-doc" {
     )
   }
 }
+
+# allow Keycloak to publish messages to SQS
+resource "aws_iam_role_policy" "keycloak_to_app_user_updates_publish" {
+  name   = "keycloak-${var.environment}-app-user-updates-publish"
+  role   = aws_iam_role.keycloak-ecs-execution-task-role.name
+  policy = data.aws_iam_policy_document.keycloak_to_app_user_updates_publish.json
+}
+
+data "aws_iam_policy_document" "keycloak_to_app_user_updates_publish" {
+  statement {
+    sid = "AllowSendFromKeycloak"
+    effect = "Allow"
+    actions = [
+      "sqs:GetQueueUrl",
+      "sqs:SendMessage"
+    ]
+    resources = [ for queue in aws_sqs_queue.keycloak_to_app_user_updates : queue.arn ]
+  }
+}

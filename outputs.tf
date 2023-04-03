@@ -9,3 +9,7 @@ output "alb_endpoint" {
 output "alb_zone_id" {
   value = aws_alb.keycloak-load-balancer.zone_id
 }
+
+output "sqs_queues" {
+  value = aws_sqs_queue.keycloak_to_app_user_updates
+}
