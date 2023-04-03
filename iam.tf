@@ -71,13 +71,13 @@ data "aws_iam_policy_document" "inline-keycloak-secretsmanager-doc" {
 }
 
 # allow Keycloak to publish messages to SQS
-resource "aws_iam_role_policy" "keycloak_to_alerts_concierge_user_updates_publish" {
-  name   = "keycloak-${var.environment}-alerts-concierge-user-updates-publish"
+resource "aws_iam_role_policy" "keycloak_to_app_user_updates_publish" {
+  name   = "keycloak-${var.environment}-app-user-updates-publish"
   role   = aws_iam_role.keycloak-ecs-execution-task-role.name
-  policy = data.aws_iam_policy_document.keycloak_to_alerts_concierge_user_updates_publish.json
+  policy = data.aws_iam_policy_document.keycloak_to_app_user_updates_publish.json
 }
 
-data "aws_iam_policy_document" "keycloak_to_alerts_concierge_user_updates_publish" {
+data "aws_iam_policy_document" "keycloak_to_app_user_updates_publish" {
   statement {
     sid = "AllowSendFromKeycloak"
     effect = "Allow"
@@ -85,8 +85,6 @@ data "aws_iam_policy_document" "keycloak_to_alerts_concierge_user_updates_publis
       "sqs:GetQueueUrl",
       "sqs:SendMessage"
     ]
-    resources = [
-      aws_sqs_queue.keycloak_to_alerts_concierge_user_updates.arn
-    ]
+    resources = [ for queue in aws_sqs_queue.keycloak_to_app_user_updates : queue.arn ]
   }
 }

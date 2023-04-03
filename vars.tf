@@ -120,3 +120,9 @@ variable "vpc_id" {
   type        = string
   description = "ID of an existing VPC where Keycloak will reside"
 }
+
+variable "applications_to_update" {
+  type        = list(string)
+  description = "A list of application names that need to receive updates about user account changes."
+  default = []
+}

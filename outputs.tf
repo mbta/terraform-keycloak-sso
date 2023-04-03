@@ -10,6 +10,6 @@ output "alb_zone_id" {
   value = aws_alb.keycloak-load-balancer.zone_id
 }
 
-output "sqs_queue_arn" {
-  value = aws_sqs_queue.keycloak_to_alerts_concierge_user_updates.arn
+output "sqs_queues" {
+  value = aws_sqs_queue.keycloak_to_app_user_updates
 }

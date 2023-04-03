@@ -1,14 +1,22 @@
-resource "aws_sqs_queue" "keycloak_to_alerts_concierge_user_updates" {
-  name = "keycloak-${var.environment}-alerts-concierge-user-updates"
+resource "aws_sqs_queue" "keycloak_to_app_user_updates" {
+  for_each = {
+    for app in var.applications_to_update
+    : app => app
+  }
+  
+  name = "keycloak-${var.environment}-app-user-updates-${each.key}"
   sqs_managed_sse_enabled = true
 }
 
 # Allow Keycloak ECS to publish messages to SQS
-resource "aws_sqs_queue_policy" "keycloak_to_alerts_concierge_user_updates" {
-  queue_url = aws_sqs_queue.keycloak_to_alerts_concierge_user_updates.id
-  policy    = data.aws_iam_policy_document.keycloak_to_alerts_concierge_user_updates_policy.json
+resource "aws_sqs_queue_policy" "keycloak_to_app_user_updates" {
+  for_each = aws_sqs_queue.keycloak_to_app_user_updates
+
+  queue_url = each.value.id
+  policy    = data.aws_iam_policy_document.keycloak_to_app_user_updates_policy.json
 }
-data "aws_iam_policy_document" "keycloak_to_alerts_concierge_user_updates_policy" {
+
+data "aws_iam_policy_document" "keycloak_to_app_user_updates_policy" {
   statement {
     sid = "AllowSendFromKeycloakECS"
     principals {
@@ -19,9 +27,7 @@ data "aws_iam_policy_document" "keycloak_to_alerts_concierge_user_updates_policy
       "sqs:GetQueueUrl",
       "sqs:SendMessage"
     ]
-    resources = [
-      aws_sqs_queue.keycloak_to_alerts_concierge_user_updates.arn
-    ]
+    resources = [ for queue in aws_sqs_queue.keycloak_to_app_user_updates : queue.arn ]
     condition {
       test     = "ArnEquals"
       variable = "aws:SourceArn"
