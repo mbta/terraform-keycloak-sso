@@ -13,10 +13,12 @@ resource "aws_sqs_queue_policy" "keycloak_to_app_user_updates" {
   for_each = aws_sqs_queue.keycloak_to_app_user_updates
 
   queue_url = each.value.id
-  policy    = data.aws_iam_policy_document.keycloak_to_app_user_updates_policy.json
+  policy    = data.aws_iam_policy_document.keycloak_to_app_user_updates_policy[each.key].json
 }
 
 data "aws_iam_policy_document" "keycloak_to_app_user_updates_policy" {
+  for_each = aws_sqs_queue.keycloak_to_app_user_updates
+  
   statement {
     sid = "AllowSendFromKeycloakECS"
     principals {
@@ -27,7 +29,9 @@ data "aws_iam_policy_document" "keycloak_to_app_user_updates_policy" {
       "sqs:GetQueueUrl",
       "sqs:SendMessage"
     ]
-    resources = [ for queue in aws_sqs_queue.keycloak_to_app_user_updates : queue.arn ]
+    resources = [
+      each.value.arn
+    ]
     condition {
       test     = "ArnEquals"
       variable = "aws:SourceArn"
