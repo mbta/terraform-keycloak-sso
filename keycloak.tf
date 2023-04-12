@@ -66,7 +66,7 @@ resource "aws_ecs_task_definition" "keycloak-ecs-taskdef" {
         {"name":"DB_DATABASE", "value":"${var.db_name}"},
         {"name":"DB_USER", "value":"${var.db_username}"},
         {"name":"JDBC_PARAMS", "value":"autoReconnect=true"},
-        {"name":"JAVA_OPTS_APPEND", "value":"-Xmx1500m"},
+        {"name":"JAVA_OPTS_APPEND", "value":"-Xmx1500m -DawsEnv=${var.environment}"},
         {"name":"JGROUPS_DISCOVERY_PROTOCOL", "value":"JDBC_PING"},
         {"name":"JGROUPS_DISCOVERY_PROPERTIES", "value":"datasource_jndi_name=java:jboss/datasources/KeycloakDS,remove_old_coords_on_view_change=true"},
         {"name":"CACHE_OWNERS_COUNT", "value":"2"},
