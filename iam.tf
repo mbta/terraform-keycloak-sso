@@ -72,6 +72,7 @@ data "aws_iam_policy_document" "inline-keycloak-secretsmanager-doc" {
 
 # allow Keycloak to publish messages to SQS
 resource "aws_iam_role_policy" "keycloak_to_app_user_updates_publish" {
+  count  = length(var.applications_to_update) > 0 ? 1 : 0
   name   = "keycloak-${var.environment}-app-user-updates-publish"
   role   = aws_iam_role.keycloak-ecs-execution-task-role.name
   policy = data.aws_iam_policy_document.keycloak_to_app_user_updates_publish.json
