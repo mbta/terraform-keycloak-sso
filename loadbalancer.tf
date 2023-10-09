@@ -67,7 +67,7 @@ resource "aws_lb_target_group" "keycloak-target-group" {
     protocol            = "HTTP"
     matcher             = "200"
     timeout             = "3"
-    path                = "/"
+    path                = "/auth/"
     unhealthy_threshold = "2"
   }
 
