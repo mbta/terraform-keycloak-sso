@@ -57,24 +57,21 @@ resource "aws_ecs_task_definition" "keycloak-ecs-taskdef" {
       "image": "${local.keycloak_image_url}:${var.ecr_keycloak_image_tag}",
       "entryPoint": [],
       "environment": [
-        {"name":"KEYCLOAK_USER", "value":"${var.kc_username}"},
-        {"name":"PROXY_ADDRESS_FORWARDING", "value":"true"},
-        {"name":"KEYCLOAK_LOGLEVEL", "value":"INFO"},
-        {"name":"ROOT_LOGLEVEL", "value":"INFO"},
-        {"name":"DB_VENDOR", "value":"mariadb"},
-        {"name":"DB_ADDR", "value":"${aws_db_instance.keycloak-database-engine.endpoint}"},
-        {"name":"DB_DATABASE", "value":"${var.db_name}"},
-        {"name":"DB_USER", "value":"${var.db_username}"},
-        {"name":"JDBC_PARAMS", "value":"autoReconnect=true"},
-        {"name":"JAVA_OPTS_APPEND", "value":"-Xmx1500m -DawsEnv=${var.environment}"},
-        {"name":"JGROUPS_DISCOVERY_PROTOCOL", "value":"JDBC_PING"},
-        {"name":"JGROUPS_DISCOVERY_PROPERTIES", "value":"datasource_jndi_name=java:jboss/datasources/KeycloakDS,remove_old_coords_on_view_change=true"},
-        {"name":"CACHE_OWNERS_COUNT", "value":"2"},
-        {"name":"CACHE_OWNERS_AUTH_SESSIONS_COUNT", "value":"2"}
+        {"name":"KEYCLOAK_ADMIN", "value":"${var.kc_username}"},
+        {"name":"KC_DB", "value":"mariadb"},
+        {"name":"KC_DB_URL", "value":"jdbc:mysql://${data.aws_db_instance.database.endpoint}/${var.db_name}?autoReconnect=true"},
+        {"name":"KC_DB_USERNAME", "value":"${var.db_username}"},
+        {"name":"KC_HTTP_RELATIVE_PATH", "value":"/auth"},
+        {"name":"KC_CACHE_CONFIG_FILE", "value":"cache-ispn-jdbc-ping.xml"},
+        {"name":"KC_HOSTNAME_STRICT", "value":"false"},
+        {"name":"KC_HTTP_ENABLED", "value":"true"},
+        {"name":"KC_LOG_LEVEL", "value":"INFO,cz.integsoft:DEBUG,org.infinispan:DEBUG,org.jgroups:DEBUG"},
+        {"name":"KC_PROXY", "value":"edge"},
+        {"name":"KC_HEALTH_ENABLED", "value":"true"}
       ],
       "secrets": [
-        {"name":"KEYCLOAK_PASSWORD", "valueFrom":"${aws_secretsmanager_secret.keycloak-admin-password.arn}"},
-        {"name":"DB_PASSWORD", "valueFrom":"${aws_secretsmanager_secret.keycloak-database-password.arn}"}
+        {"name":"KEYCLOAK_ADMIN_PASSWORD", "valueFrom":"${aws_secretsmanager_secret.keycloak-admin-password.arn}"},
+        {"name":"KC_DB_PASSWORD", "valueFrom":"${aws_secretsmanager_secret.keycloak-database-password.arn}"}
       ],
       "essential": true,
       "logConfiguration": ${local.log_configuration},
