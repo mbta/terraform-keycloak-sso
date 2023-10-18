@@ -59,7 +59,9 @@ resource "aws_ecs_task_definition" "keycloak-ecs-taskdef" {
       "environment": [
         {"name":"KEYCLOAK_ADMIN", "value":"${var.kc_username}"},
         {"name":"KC_DB", "value":"mariadb"},
-        {"name":"KC_DB_URL", "value":"jdbc:mysql://${aws_db_instance.keycloak-database-engine.endpoint}/${var.db_name}?autoReconnect=true"},
+        {"name":"KC_DB_URL_HOST", "value":"${aws_db_instance.keycloak-database-engine.endpoint}"},
+        {"name":"KC_DB_URL_DATABASE", "value":"${var.db_name}"},
+        {"name":"KC_DB_URL_PROPERTIES", "value":"?autoReconnect=true"},
         {"name":"KC_DB_USERNAME", "value":"${var.db_username}"},
         {"name":"KC_HTTP_RELATIVE_PATH", "value":"/auth"},
         {"name":"KC_CACHE_CONFIG_FILE", "value":"cache-ispn-jdbc-ping.xml"},
