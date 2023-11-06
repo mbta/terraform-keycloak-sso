@@ -70,7 +70,7 @@ resource "aws_ecs_task_definition" "keycloak-ecs-taskdef" {
         {"name":"KC_LOG_LEVEL", "value":"INFO,cz.integsoft:DEBUG,org.infinispan:DEBUG,org.jgroups:DEBUG"},
         {"name":"KC_PROXY", "value":"edge"},
         {"name":"KC_HEALTH_ENABLED", "value":"true"},
-        {"name":"JAVA_OPTS_APPEND", "value":"-Xmx1500m -DawsEnv=${var.environment}"}
+        {"name":"JAVA_OPTS_APPEND", "value":"-Xmx1500m -DawsRegion=${var.aws_region} -DawsJmsQueues=${var.aws_jms_queues}"}
       ],
       "secrets": [
         {"name":"KEYCLOAK_ADMIN_PASSWORD", "valueFrom":"${aws_secretsmanager_secret.keycloak-admin-password.arn}"},
