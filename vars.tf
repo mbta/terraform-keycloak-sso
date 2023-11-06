@@ -21,6 +21,11 @@ variable "aws_region" {
   description = "AWS Region"
 }
 
+variable "aws_jms_queues" {
+  type        = string
+  description = "AWS JMS queue names (comma separated)"
+}
+
 variable "database_subnet_group" {
   type        = string
   description = "(optional) Name of a database subnet group where Keycloak MariaDB instance will reside. Defaults to creating a new subnet group containing var.private_subnets"
