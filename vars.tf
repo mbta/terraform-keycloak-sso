@@ -131,3 +131,8 @@ variable "applications_to_update" {
   description = "A list of application names that need to receive updates about user account changes."
   default = []
 }
+
+variable "kc_features" {
+  type        = string
+  description = "Keycloak features"
+}
