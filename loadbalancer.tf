@@ -87,3 +87,28 @@ resource "aws_lb_listener" "keycloak-listener" {
     target_group_arn = aws_lb_target_group.keycloak-target-group.id
   }
 }
+
+resource "aws_lb_listener_rule" "redirect_to_mbta_com" {
+  listener_arn = aws_lb_listener.keycloak-listener.arn
+  priority     = 100
+  action {
+    type = "redirect"
+    redirect {
+      host        = "mbta.com"
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+      path        = "/"
+      query       = ""
+    }
+  }
+  condition {
+    path_pattern {
+      values      = ["/"]
+    }
+  }
+  tags = {
+    project     = "MBTA-Keycloak"
+    Name        = "Redirect-to-MBTA-page"
+  }
+}
