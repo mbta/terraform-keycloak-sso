@@ -17,6 +17,8 @@ resource "aws_cloudwatch_metric_alarm" "keycloak-alarm-scale-down" {
     ClusterName = local.keycloak_ecs_cluster_name
     ServiceName = aws_ecs_service.keycloak-service.name
   }
+
+  tags = var.tags
 }
 
 # CLOUDWATCH ALARM  to monitor memory utilization of a service
@@ -38,6 +40,8 @@ resource "aws_cloudwatch_metric_alarm" "keycloak-alarm-scale-up" {
     ClusterName = local.keycloak_ecs_cluster_name
     ServiceName = aws_ecs_service.keycloak-service.name
   }
+
+  tags = var.tags
 }
 
 resource "aws_appautoscaling_target" "keycloak-ecs-target" {
@@ -46,6 +50,8 @@ resource "aws_appautoscaling_target" "keycloak-ecs-target" {
   resource_id        = "service/${local.keycloak_ecs_cluster_name}/${aws_ecs_service.keycloak-service.name}"
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
+
+  tags = var.tags
 }
 
 # Set up the memory utilization policy for scale down when the cloudwatch alarm gets triggered.
@@ -85,4 +91,3 @@ resource "aws_appautoscaling_policy" "keycloak-policy-scale-up" {
     }
   }
 }
-

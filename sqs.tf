@@ -3,9 +3,11 @@ resource "aws_sqs_queue" "keycloak_to_app_user_updates" {
     for app in var.applications_to_update
     : app => app
   }
-  
-  name = "keycloak-${var.environment}-app-user-updates-${each.key}"
+
+  name                    = "keycloak-${var.environment}-app-user-updates-${each.key}"
   sqs_managed_sse_enabled = true
+
+  tags = var.tags
 }
 
 # Allow Keycloak ECS to publish messages to SQS
@@ -18,7 +20,7 @@ resource "aws_sqs_queue_policy" "keycloak_to_app_user_updates" {
 
 data "aws_iam_policy_document" "keycloak_to_app_user_updates_policy" {
   for_each = aws_sqs_queue.keycloak_to_app_user_updates
-  
+
   statement {
     sid = "AllowSendFromKeycloakECS"
     principals {
