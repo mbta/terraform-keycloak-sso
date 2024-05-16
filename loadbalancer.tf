@@ -86,6 +86,8 @@ resource "aws_lb_listener" "keycloak-listener" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.keycloak-target-group.id
   }
+
+  tags = var.tags
 }
 
 resource "aws_lb_listener_rule" "redirect_to_mbta_com" {
@@ -104,11 +106,11 @@ resource "aws_lb_listener_rule" "redirect_to_mbta_com" {
   }
   condition {
     path_pattern {
-      values      = ["/"]
+      values = ["/"]
     }
   }
-  tags = {
-    project     = "MBTA-Keycloak"
-    Name        = "Redirect-to-MBTA-page"
-  }
+
+  tags = merge(var.tags, {
+    Name = "Redirect-to-MBTA-page"
+  })
 }

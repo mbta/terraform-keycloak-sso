@@ -141,6 +141,8 @@ resource "aws_ecs_service" "keycloak-service" {
     ]
   }
 
+  tags = var.tags
+
   depends_on = [aws_lb_listener.keycloak-listener, aws_iam_role.keycloak-ecs-execution-task-role, aws_db_instance.keycloak-database-engine]
 }
 
