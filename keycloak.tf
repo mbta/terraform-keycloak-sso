@@ -86,6 +86,10 @@ resource "aws_ecs_task_definition" "keycloak-ecs-taskdef" {
         {
           "containerPort": 7600,
           "hostPort": 7600
+        },
+        {
+          "containerPort": 9000,
+          "hostPort": 9000
         }
       ],
       "cpu": 512,
