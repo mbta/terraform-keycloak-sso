@@ -68,6 +68,7 @@ resource "aws_lb_target_group" "keycloak-target-group" {
     matcher             = "200"
     timeout             = "3"
     path                = "/auth/health"
+    port                = 9000
     unhealthy_threshold = "2"
   }
 
