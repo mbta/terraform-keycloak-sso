@@ -131,3 +131,9 @@ variable "applications_to_update" {
   description = "A list of application names that need to receive updates about user account changes."
   default = []
 }
+
+variable "backup_retention_period" {
+  type        = number
+  description = "How long to store RDS DB backups"
+  default     = null
+}
