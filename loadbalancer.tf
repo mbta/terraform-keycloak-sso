@@ -97,7 +97,7 @@ resource "aws_lb_listener_rule" "redirect_to_mbta_com" {
   action {
     type = "redirect"
     redirect {
-      host        = "mbta.com"
+      host        = "www.mbta.com"
       port        = "443"
       protocol    = "HTTPS"
       status_code = "HTTP_301"
