@@ -64,7 +64,6 @@ resource "aws_ecs_task_definition" "keycloak-ecs-taskdef" {
         {"name":"KC_DB_URL_PROPERTIES", "value":"?autoReconnect=true"},
         {"name":"KC_DB_USERNAME", "value":"${var.db_username}"},
         {"name":"KC_HTTP_RELATIVE_PATH", "value":"/auth"},
-        {"name":"KC_CACHE_CONFIG_FILE", "value":"cache-ispn-jdbc-ping.xml"},
         {"name":"KC_HOSTNAME_STRICT", "value":"false"},
         {"name":"KC_HTTP_ENABLED", "value":"true"},
         {"name":"KC_LOG_LEVEL", "value":"INFO,cz.integsoft:DEBUG,org.infinispan:DEBUG,org.jgroups:DEBUG"},
