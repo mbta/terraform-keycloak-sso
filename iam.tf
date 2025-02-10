@@ -43,8 +43,6 @@ resource "aws_iam_role" "keycloak-db-monitoring-role" {
     ]
   })
 
-  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AmazonRDSEnhancedMonitoringRole"]
-
   tags = var.tags
 }
 
