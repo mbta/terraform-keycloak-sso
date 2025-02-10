@@ -48,6 +48,11 @@ resource "aws_iam_role" "keycloak-db-monitoring-role" {
   tags = var.tags
 }
 
+resource "aws_iam_role_policy_attachment" "keycloak-db-monitoring-role" {
+  role       = aws_iam_role.keycloak-db-monitoring-role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonRDSEnhancedMonitoringRole"
+}
+
 # inline policy for Secrets Manager access, attached to the task execution role created by the ECS module
 resource "aws_iam_role_policy" "inline-keycloak-secretsmanager" {
   name   = "secretsmanager-keycloak-${var.environment}"
