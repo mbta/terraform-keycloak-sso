@@ -66,10 +66,10 @@ resource "aws_lb_target_group" "keycloak-target-group" {
     interval            = "300"
     protocol            = "HTTP"
     matcher             = "200"
-    timeout             = "3"
+    timeout             = "10"
     path                = "/auth/health"
     port                = 9000
-    unhealthy_threshold = "2"
+    unhealthy_threshold = "3"
   }
 
   tags = var.tags
