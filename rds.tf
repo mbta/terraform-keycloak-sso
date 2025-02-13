@@ -76,23 +76,23 @@ resource "aws_db_option_group" "rds-mariadb-og" {
 }
 
 resource "aws_db_instance" "keycloak-database-engine" {
-  db_name                = var.db_name
-  identifier             = "keycloak-${var.environment}"
-  allocated_storage      = 20
-  max_allocated_storage  = 100
-  engine                 = "mariadb"
-  engine_version         = "10.5"
-  instance_class         = "db.t3.micro"
-  db_subnet_group_name   = local.db_subnet_group
-  multi_az               = true
-  username               = var.db_username
-  parameter_group_name   = "rds-keycloak-${var.environment}-mariadb-pg"
-  option_group_name      = "rds-keycloak-${var.environment}-mariadb-og"
-  vpc_security_group_ids = [aws_security_group.database-sg.id]
-  skip_final_snapshot    = true
-  monitoring_interval    = 15
-  monitoring_role_arn    = aws_iam_role.keycloak-db-monitoring-role.arn
-  storage_encrypted      = true
+  db_name                 = var.db_name
+  identifier              = "keycloak-${var.environment}"
+  allocated_storage       = 20
+  max_allocated_storage   = 100
+  engine                  = "mariadb"
+  engine_version          = "10.5"
+  instance_class          = "db.t3.micro"
+  db_subnet_group_name    = local.db_subnet_group
+  multi_az                = true
+  username                = var.db_username
+  parameter_group_name    = "rds-keycloak-${var.environment}-mariadb-pg"
+  option_group_name       = "rds-keycloak-${var.environment}-mariadb-og"
+  vpc_security_group_ids  = [aws_security_group.database-sg.id]
+  skip_final_snapshot     = true
+  monitoring_interval     = 15
+  monitoring_role_arn     = aws_iam_role.keycloak-db-monitoring-role.arn
+  storage_encrypted       = true
   backup_retention_period = var.backup_retention_period
 
   # this value leaks into state and thus should be changed on creation.

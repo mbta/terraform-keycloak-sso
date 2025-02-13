@@ -129,7 +129,7 @@ variable "vpc_id" {
 variable "applications_to_update" {
   type        = list(string)
   description = "A list of application names that need to receive updates about user account changes."
-  default = []
+  default     = []
 }
 
 variable "backup_retention_period" {

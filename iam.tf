@@ -83,12 +83,12 @@ resource "aws_iam_role_policy" "keycloak_to_app_user_updates_publish" {
 
 data "aws_iam_policy_document" "keycloak_to_app_user_updates_publish" {
   statement {
-    sid = "AllowSendFromKeycloak"
+    sid    = "AllowSendFromKeycloak"
     effect = "Allow"
     actions = [
       "sqs:GetQueueUrl",
       "sqs:SendMessage"
     ]
-    resources = [ for queue in aws_sqs_queue.keycloak_to_app_user_updates : queue.arn ]
+    resources = [for queue in aws_sqs_queue.keycloak_to_app_user_updates : queue.arn]
   }
 }
