@@ -69,7 +69,7 @@ resource "aws_ecs_task_definition" "keycloak-ecs-taskdef" {
         {"name":"KC_LOG_LEVEL", "value":"INFO,cz.integsoft:DEBUG,org.infinispan:DEBUG,org.jgroups:DEBUG"},
         {"name":"KC_PROXY", "value":"edge"},
         {"name":"KC_HEALTH_ENABLED", "value":"true"},
-        {"name":"JAVA_OPTS_APPEND", "value":"-Xmx1500m -DawsRegion=${var.aws_region} -DawsJmsQueues=${var.aws_jms_queues}"},
+        {"name":"JAVA_OPTS_APPEND", "value":"-Xmx4000m -DawsRegion=${var.aws_region} -DawsJmsQueues=${var.aws_jms_queues}"},
         {"name":"KC_PROXY_HEADERS", "value":"xforwarded"}
       ],
       "secrets": [
@@ -92,8 +92,8 @@ resource "aws_ecs_task_definition" "keycloak-ecs-taskdef" {
           "hostPort": 9000
         }
       ],
-      "cpu": 512,
-      "memory": 2048,
+      "cpu": 1024,
+      "memory": 4096,
       "networkMode": "awsvpc"
     }
   ]
