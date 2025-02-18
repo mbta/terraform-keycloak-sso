@@ -3,6 +3,9 @@ locals {
   keycloak_image_url        = var.ecr_keycloak_image_url == null ? join("", aws_ecr_repository.keycloak-image-repository.*.repository_url) : var.ecr_keycloak_image_url
   keycloak_ecs_cluster_name = var.ecs_cluster_name == null ? "keycloak-${var.environment}-cluster" : var.ecs_cluster_name
   keycloak_ecs_cluster_arn  = var.ecs_cluster_name == null ? join("", aws_ecs_cluster.keycloak-cluster.*.arn) : join("", data.aws_ecs_cluster.keycloak-cluster.*.arn)
+  keycloak_task_cpu         = 1024
+  keycloak_task_memory      = 4096
+  keycloak_java_memory      = local.keycloak_task_memory - 500
 }
 
 data "aws_ecs_cluster" "keycloak-cluster" {
@@ -69,7 +72,7 @@ resource "aws_ecs_task_definition" "keycloak-ecs-taskdef" {
         {"name":"KC_LOG_LEVEL", "value":"INFO,cz.integsoft:DEBUG,org.infinispan:DEBUG,org.jgroups:DEBUG"},
         {"name":"KC_PROXY", "value":"edge"},
         {"name":"KC_HEALTH_ENABLED", "value":"true"},
-        {"name":"JAVA_OPTS_APPEND", "value":"-Xmx1500m -DawsRegion=${var.aws_region} -DawsJmsQueues=${var.aws_jms_queues}"},
+        {"name":"JAVA_OPTS_APPEND", "value":"-Xmx${local.keycloak_java_memory}m -DawsRegion=${var.aws_region} -DawsJmsQueues=${var.aws_jms_queues}"},
         {"name":"KC_PROXY_HEADERS", "value":"xforwarded"}
       ],
       "secrets": [
@@ -92,8 +95,8 @@ resource "aws_ecs_task_definition" "keycloak-ecs-taskdef" {
           "hostPort": 9000
         }
       ],
-      "cpu": 512,
-      "memory": 2048,
+      "cpu": ${local.keycloak_task_cpu},
+      "memory": ${local.keycloak_task_memory},
       "networkMode": "awsvpc"
     }
   ]
@@ -101,8 +104,8 @@ resource "aws_ecs_task_definition" "keycloak-ecs-taskdef" {
 
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
-  memory                   = "4096"
-  cpu                      = "1024"
+  memory                   = local.keycloak_task_memory
+  cpu                      = local.keycloak_task_cpu
   execution_role_arn       = aws_iam_role.keycloak-ecs-execution-task-role.arn
   task_role_arn            = aws_iam_role.keycloak-ecs-execution-task-role.arn
 
