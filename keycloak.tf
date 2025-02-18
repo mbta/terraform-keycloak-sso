@@ -3,6 +3,8 @@ locals {
   keycloak_image_url        = var.ecr_keycloak_image_url == null ? join("", aws_ecr_repository.keycloak-image-repository.*.repository_url) : var.ecr_keycloak_image_url
   keycloak_ecs_cluster_name = var.ecs_cluster_name == null ? "keycloak-${var.environment}-cluster" : var.ecs_cluster_name
   keycloak_ecs_cluster_arn  = var.ecs_cluster_name == null ? join("", aws_ecs_cluster.keycloak-cluster.*.arn) : join("", data.aws_ecs_cluster.keycloak-cluster.*.arn)
+  keycloak_task_cpu         = 1024
+  keycloak_task_memory      = 4096
 }
 
 data "aws_ecs_cluster" "keycloak-cluster" {
@@ -92,8 +94,8 @@ resource "aws_ecs_task_definition" "keycloak-ecs-taskdef" {
           "hostPort": 9000
         }
       ],
-      "cpu": 1024,
-      "memory": 4096,
+      "cpu": ${local.keycloak_task_cpu},
+      "memory": ${local.keycloak_task_memory},
       "networkMode": "awsvpc"
     }
   ]
@@ -101,8 +103,8 @@ resource "aws_ecs_task_definition" "keycloak-ecs-taskdef" {
 
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
-  memory                   = "4096"
-  cpu                      = "1024"
+  memory                   = local.keycloak_task_memory
+  cpu                      = local.keycloak_task_cpu
   execution_role_arn       = aws_iam_role.keycloak-ecs-execution-task-role.arn
   task_role_arn            = aws_iam_role.keycloak-ecs-execution-task-role.arn
 
