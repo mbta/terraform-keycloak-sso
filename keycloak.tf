@@ -74,10 +74,10 @@ resource "aws_ecs_task_definition" "keycloak-ecs-taskdef" {
         {"name":"KC_HEALTH_ENABLED", "value":"true"},
         {"name":"JAVA_OPTS_APPEND", "value":"-Xmx${local.keycloak_java_memory}m -DawsRegion=${var.aws_region} -DawsJmsQueues=${var.aws_jms_queues}"},
         {"name":"KC_PROXY_HEADERS", "value":"xforwarded"},
-        {"name":"QUARKUS_HTTP_ACCESS_LOG_ENABLED", "value":"${var.accessLog_enabled}"},
+        {"name":"QUARKUS_HTTP_ACCESS_LOG_ENABLED", "value":"${var.access_log_enabled}"},
         {"name":"QUARKUS_HTTP_ACCESS_LOG_PATTERN", "value":"%t [%%{i,X-Forwarded-For}, %h] %l (user:%u) - '%r' => %s (%b bytes) '%%{i,User-Agent}' (Referer '%%{i,Referer}') - [%I, %Dms]"},
-        {"name":"QUARKUS_HTTP_ACCESS_LOG_CONSOLIDATE_REROUTED_REQUESTS", "value":"${var.accessLog_consolidate}"},
-        {"name":"QUARKUS_HTTP_RECORD_REQUEST_START_TIME", "value":"${var.accessLog_recordStartTime}"}
+        {"name":"QUARKUS_HTTP_ACCESS_LOG_CONSOLIDATE_REROUTED_REQUESTS", "value":"${var.access_log_consolidate}"},
+        {"name":"QUARKUS_HTTP_RECORD_REQUEST_START_TIME", "value":"${var.access_log_record_start_time}"}
       ],
       "secrets": [
         {"name":"KEYCLOAK_ADMIN_PASSWORD", "valueFrom":"${aws_secretsmanager_secret.keycloak-admin-password.arn}"},

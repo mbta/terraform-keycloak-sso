@@ -138,19 +138,19 @@ variable "backup_retention_period" {
   default     = null
 }
 
-variable "accessLog_enabled" {
+variable "access_log_enabled" {
   type        = bool
   description = "Enables Keycloak access log"
   default     = false
 }
 
-variable "accessLog_consolidate" {
+variable "access_log_consolidate" {
   type        = bool
   description = "Enables HTTP rerouted requests consolidation"
   default     = false
 }
 
-variable "accessLog_recordStartTime" {
+variable "access_log_record_start_time" {
   type        = bool
   description = "Enables HTTP request elapsed time in milliseconds"
   default     = false
