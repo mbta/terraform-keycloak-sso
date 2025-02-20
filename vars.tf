@@ -137,3 +137,21 @@ variable "backup_retention_period" {
   description = "How long to store RDS DB backups"
   default     = null
 }
+
+variable "accessLog_enabled" {
+  type        = bool
+  description = "Enables Keycloak access log"
+  default     = false
+}
+
+variable "accessLog_consolidate" {
+  type        = bool
+  description = "Enables HTTP rerouted requests consolidation"
+  default     = false
+}
+
+variable "accessLog_recordStartTime" {
+  type        = bool
+  description = "Enables HTTP request elapsed time in milliseconds"
+  default     = false
+}
