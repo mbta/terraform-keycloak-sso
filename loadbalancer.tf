@@ -59,7 +59,7 @@ resource "aws_lb_target_group" "keycloak-target-group" {
 
   health_check {
     healthy_threshold   = "3"
-    interval            = "300"
+    interval            = "30"
     protocol            = "HTTP"
     matcher             = "200"
     timeout             = "10"
