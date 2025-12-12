@@ -103,6 +103,12 @@ variable "public_subnets" {
   description = "List of public subnets in the VPC where Keycloak will reside"
 }
 
+variable "admin_cidrs" {
+  type        = list(string)
+  default     = null
+  description = "(optional) list of CIDRs to restrict the admin interfaces to"
+}
+
 variable "splunk_http_endpoint" {
   type        = string
   description = "(optional) The Splunk HTTP endpoint to send logs to. Only required if log_driver is 'splunk'"

@@ -18,3 +18,6 @@ override.tf.json
 
 # ignore tfvars files as this repo is meant to be used by other modules
 *.tfvars
+
+.envrc
+test/.terraform.lock.hcl
