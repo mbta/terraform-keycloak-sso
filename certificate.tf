@@ -30,8 +30,8 @@ resource "aws_acm_certificate" "keycloak-certificate" {
   # only create this resource if acm_certificate_arn is null
   count = var.acm_certificate_arn == null ? 1 : 0
 
-  private_key      = tls_private_key.keycloak-pk.*.private_key_pem
-  certificate_body = tls_self_signed_cert.keycloak-certificate-body.*.cert_pem
+  private_key      = one(tls_private_key.keycloak-pk.*.private_key_pem)
+  certificate_body = one(tls_self_signed_cert.keycloak-certificate-body.*.cert_pem)
 
   tags = var.tags
 }
