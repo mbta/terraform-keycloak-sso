@@ -3,13 +3,15 @@ locals {
 }
 
 resource "aws_secretsmanager_secret" "keycloak-admin-password" {
-  name = "keycloak-${var.environment}-admin-password"
+  name                    = "keycloak-${var.environment}-admin-password"
+  recovery_window_in_days = var.is_temporary ? 0 : 30
 
   tags = var.tags
 }
 
 resource "aws_secretsmanager_secret" "keycloak-database-password" {
-  name = "keycloak-${var.environment}-db-password"
+  name                    = "keycloak-${var.environment}-db-password"
+  recovery_window_in_days = var.is_temporary ? 0 : 30
 
   tags = var.tags
 }
@@ -18,8 +20,9 @@ resource "aws_secretsmanager_secret" "keycloak-database-password" {
 resource "aws_secretsmanager_secret" "keycloak-splunk-token" {
   count = var.log_driver == "splunk" && var.splunk_token_secret_arn == null ? 1 : 0
 
-  name        = "keycloak-splunk-token"
-  description = "Keycloak Splunk HTTP Event Collector token"
+  name                    = "keycloak-splunk-token"
+  description             = "Keycloak Splunk HTTP Event Collector token"
+  recovery_window_in_days = var.is_temporary ? 0 : 30
 
   tags = var.tags
 }

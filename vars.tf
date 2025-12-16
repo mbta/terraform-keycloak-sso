@@ -161,3 +161,9 @@ variable "access_log_record_start_time" {
   description = "Enables HTTP request elapsed time in milliseconds"
   default     = false
 }
+
+variable "is_temporary" {
+  type        = bool
+  description = "If true, support quick termination of created resources."
+  default     = false
+}

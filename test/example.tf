@@ -39,10 +39,6 @@ data "aws_availability_zones" "available" {
   }
 }
 
-resource "aws_ecs_cluster" "this" {
-  name = local.name
-}
-
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "6.5.1"
@@ -56,7 +52,8 @@ module "vpc" {
 }
 
 module "example" {
-  source = "./.."
+  source       = "./.."
+  is_temporary = true
 
   aws_region     = local.region
   aws_jms_queues = ""
@@ -72,7 +69,6 @@ module "example" {
   private_subnets = module.vpc.private_subnets
   public_subnets  = module.vpc.public_subnets
 
-  ecs_cluster_name       = aws_ecs_cluster.this.name
   ecr_keycloak_image_url = "hub.docker.com"
   ecr_keycloak_image_tag = "keycloak/keycloak:26.4"
 
