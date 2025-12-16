@@ -13,3 +13,7 @@ output "alb_zone_id" {
 output "sqs_queues" {
   value = aws_sqs_queue.keycloak_to_app_user_updates
 }
+
+output "admin_password_secret_id" {
+  value = aws_secretsmanager_secret.keycloak-admin-password.id
+}

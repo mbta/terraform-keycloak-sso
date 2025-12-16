@@ -52,8 +52,9 @@ module "vpc" {
 }
 
 module "example" {
-  source       = "./.."
-  is_temporary = true
+  source        = "./.."
+  is_temporary  = true
+  set_passwords = true
 
   aws_region     = local.region
   aws_jms_queues = ""

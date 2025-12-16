@@ -162,6 +162,11 @@ variable "access_log_record_start_time" {
   default     = false
 }
 
+variable "set_passwords" {
+  type        = bool
+  description = "If true, automatically set the admin/DB passwords."
+  default     = false
+}
 variable "is_temporary" {
   type        = bool
   description = "If true, support quick termination of created resources."
