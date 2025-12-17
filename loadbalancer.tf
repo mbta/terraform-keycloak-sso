@@ -105,6 +105,8 @@ resource "aws_lb_listener_rule" "forward_admin_from_cidrs" {
     path_pattern {
       values = local.admin_paths
     }
+  }
+  condition {
     source_ip {
       values = var.admin_cidrs
     }
