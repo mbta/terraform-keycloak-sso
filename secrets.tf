@@ -21,6 +21,12 @@ resource "aws_secretsmanager_secret" "keycloak-admin-password" {
   tags = var.tags
 }
 
+resource "aws_secretsmanager_secret_version" "keycloak-database-password" {
+  count                    = var.set_passwords ? 1 : 0
+  secret_id                = aws_secretsmanager_secret.keycloak-database-password.id
+  secret_string_wo         = random_password.database-password.result
+  secret_string_wo_version = 1
+}
 resource "aws_secretsmanager_secret" "keycloak-database-password" {
   name                    = "keycloak-${var.environment}-db-password"
   recovery_window_in_days = var.is_temporary ? 0 : 30

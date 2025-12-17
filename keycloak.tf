@@ -58,7 +58,7 @@ resource "aws_ecs_task_definition" "keycloak-ecs-taskdef" {
     {
       "name": "keycloak-${var.environment}",
       "image": "${local.keycloak_image_url}:${var.ecr_keycloak_image_tag}",
-      "entryPoint": [],
+      "entryPoint": ${jsonencode(var.ecr_keycloak_image_entrypoint)},
       "environment": [
         {"name":"KEYCLOAK_ADMIN", "value":"${var.kc_username}"},
         {"name":"KC_DB", "value":"mariadb"},

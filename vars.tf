@@ -162,6 +162,11 @@ variable "access_log_record_start_time" {
   default     = false
 }
 
+variable "ecr_keycloak_image_entrypoint" {
+  type        = list(string)
+  description = "Optional ENTRYPOINT for the Keycloak image."
+  default     = []
+}
 variable "set_passwords" {
   type        = bool
   description = "If true, automatically set the admin/DB passwords."
