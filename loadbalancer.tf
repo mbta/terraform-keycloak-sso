@@ -7,6 +7,8 @@ locals {
     "/auth/realms/master/*",
     "/auth/admin/master/console*"
   ]
+  # ALB rules can only have 5 items in them, and we also have path rules, so limit them to 5 - length(admin_paths)
+  admin_cidrs_chunked = var.admin_cidrs == null ? [] : chunklist(var.admin_cidrs, 5 - length(local.admin_paths))
 }
 
 resource "aws_security_group" "keycloak-load-balancer-sg" {
@@ -93,9 +95,9 @@ resource "aws_lb_listener" "keycloak-listener" {
 }
 
 resource "aws_lb_listener_rule" "forward_admin_from_cidrs" {
-  count        = var.admin_cidrs == null ? 0 : 1
+  count        = length(local.admin_cidrs_chunked)
   listener_arn = aws_lb_listener.keycloak-listener.arn
-  priority     = 50
+  priority     = 50 + count.index
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.keycloak-target-group.id
@@ -106,7 +108,7 @@ resource "aws_lb_listener_rule" "forward_admin_from_cidrs" {
       values = local.admin_paths
     }
     source_ip {
-      values = var.admin_cidrs
+      values = local.admin_cidrs_chunked[count.index]
     }
   }
 }

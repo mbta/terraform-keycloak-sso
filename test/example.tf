@@ -78,7 +78,13 @@ module "example" {
 
   acm_hostname = "${local.name}.local"
   admin_cidrs = [
-    "${chomp(data.http.myip.response_body)}/32"
+    "${chomp(data.http.myip.response_body)}/32",
+    "127.0.0.1/32",
+    "127.0.0.2/32",
+    "127.0.0.3/32",
+    "127.0.0.4/32",
+    "127.0.0.5/32",
+    "127.0.0.6/32",
   ]
 
   kc_username = "admin"
