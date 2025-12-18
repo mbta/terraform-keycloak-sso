@@ -20,7 +20,8 @@ provider "aws" {
 
   default_tags {
     tags = {
-      Project = local.name
+      Project   = local.name
+      Terraform = true
     }
 
   }
@@ -39,8 +40,12 @@ data "aws_availability_zones" "available" {
   }
 }
 
-resource "aws_ecs_cluster" "this" {
-  name = local.name
+data "aws_secretsmanager_secret_version" "admin_password" {
+  secret_id = module.example.admin_password_secret_id
+}
+
+output "admin_password" {
+  value = nonsensitive(data.aws_secretsmanager_secret_version.admin_password.secret_string)
 }
 
 module "vpc" {
@@ -53,10 +58,13 @@ module "vpc" {
   public_subnets  = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 4, k)]
   private_subnets = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 4, 4 + k)]
 
+  enable_nat_gateway = true # needed for Fargate to access AWS services
 }
 
 module "example" {
-  source = "./.."
+  source        = "./.."
+  is_temporary  = true
+  set_passwords = true
 
   aws_region     = local.region
   aws_jms_queues = ""
@@ -72,9 +80,9 @@ module "example" {
   private_subnets = module.vpc.private_subnets
   public_subnets  = module.vpc.public_subnets
 
-  ecs_cluster_name       = aws_ecs_cluster.this.name
-  ecr_keycloak_image_url = "hub.docker.com"
-  ecr_keycloak_image_tag = "keycloak/keycloak:26.4"
+  ecr_keycloak_image_url        = "quay.io/keycloak/keycloak"
+  ecr_keycloak_image_tag        = "26.3"
+  ecr_keycloak_image_entrypoint = ["/opt/keycloak/bin/kc.sh", "start-dev"]
 
   acm_hostname = "${local.name}.local"
   admin_cidrs = [

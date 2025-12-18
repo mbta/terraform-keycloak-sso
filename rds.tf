@@ -93,7 +93,7 @@ resource "aws_db_instance" "keycloak-database-engine" {
   monitoring_interval     = 15
   monitoring_role_arn     = aws_iam_role.keycloak-db-monitoring-role.arn
   storage_encrypted       = true
-  backup_retention_period = var.backup_retention_period
+  backup_retention_period = var.is_temporary ? 0 : var.backup_retention_period
 
   # this value leaks into state and thus should be changed on creation.
   # any changes are ignored by the lifecycle policy below.
