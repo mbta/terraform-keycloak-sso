@@ -6,6 +6,7 @@ locals {
   keycloak_task_cpu         = 1024
   keycloak_task_memory      = 4096
   keycloak_java_memory      = local.keycloak_task_memory - 500
+  admin_hostname            = var.admin_hostname == null ? var.hostname : var.admin_hostname
 }
 
 data "aws_ecs_cluster" "keycloak-cluster" {
@@ -67,10 +68,12 @@ resource "aws_ecs_task_definition" "keycloak-ecs-taskdef" {
         {"name":"KC_DB_URL_PROPERTIES", "value":"?autoReconnect=true"},
         {"name":"KC_DB_USERNAME", "value":"${var.db_username}"},
         {"name":"KC_HTTP_RELATIVE_PATH", "value":"/auth"},
-        {"name":"KC_HOSTNAME_STRICT", "value":"false"},
+        {"name":"KC_HOSTNAME", "value": "https://${var.hostname}/auth"},
+        {"name":"KC_HOSTNAME_ADMIN", "value":"https://${local.admin_hostname}/auth"},
+        {"name":"KC_HOSTNAME_STRICT", "value":"true"},
         {"name":"KC_HTTP_ENABLED", "value":"true"},
         {"name":"KC_LOG_LEVEL", "value":"INFO,cz.integsoft:DEBUG,org.infinispan:DEBUG,org.jgroups:DEBUG"},
-        {"name":"KC_PROXY", "value":"edge"},
+        {"name":"KC_PROXY_HEADERS", "value":"xforwarded"},
         {"name":"KC_HEALTH_ENABLED", "value":"true"},
         {"name":"JAVA_OPTS_APPEND", "value":"-Xmx${local.keycloak_java_memory}m -DawsRegion=${var.aws_region} -DawsJmsQueues=${var.aws_jms_queues}"},
         {"name":"KC_PROXY_HEADERS", "value":"xforwarded"},

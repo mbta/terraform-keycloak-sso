@@ -12,8 +12,10 @@ resource "tls_self_signed_cert" "keycloak-certificate-body" {
 
   private_key_pem = join("", tls_private_key.keycloak-pk.*.private_key_pem)
 
+  dns_names = distinct([var.hostname, local.admin_hostname])
+
   subject {
-    common_name  = var.acm_hostname
+    common_name  = var.hostname
     organization = var.organization
   }
 

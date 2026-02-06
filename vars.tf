@@ -4,10 +4,15 @@ variable "acm_certificate_arn" {
   default     = null
 }
 
-variable "acm_hostname" {
+variable "hostname" {
   type        = string
-  description = "(optional) DNS hostname of the Keycloak instance. Only needed if generating a certificate within this module"
-  default     = "keycloak.example.com"
+  description = "DNS hostname of the Keycloak instance."
+}
+
+variable "admin_hostname" {
+  type        = string
+  description = "DNS hostname of the admin panel. If not specified, defaults to the main hostname."
+  default     = null
 }
 
 variable "autoscale" {
