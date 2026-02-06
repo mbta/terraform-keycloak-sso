@@ -74,6 +74,7 @@ resource "aws_ecs_task_definition" "keycloak-ecs-taskdef" {
         {"name":"KC_HEALTH_ENABLED", "value":"true"},
         {"name":"JAVA_OPTS_APPEND", "value":"-Xmx${local.keycloak_java_memory}m -DawsRegion=${var.aws_region} -DawsJmsQueues=${var.aws_jms_queues}"},
         {"name":"KC_PROXY_HEADERS", "value":"xforwarded"},
+        {"name":"KC_SPI_STICKY_SESSION_ENCODER__INFINISPAN__SHOULD_ATTACH_ROUTE", "value": "false"},
         {"name":"QUARKUS_HTTP_ACCESS_LOG_ENABLED", "value":"${var.access_log_enabled}"},
         {"name":"QUARKUS_HTTP_ACCESS_LOG_PATTERN", "value":"%t [%%{i,X-Forwarded-For}, %h] %l (user:%u) - '%r' => %s (%b bytes) '%%{i,User-Agent}' (Referer '%%{i,Referer}') - [%I, %Dms]"},
         {"name":"QUARKUS_HTTP_ACCESS_LOG_CONSOLIDATE_REROUTED_REQUESTS", "value":"${var.access_log_consolidate}"},
