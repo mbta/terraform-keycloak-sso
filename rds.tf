@@ -40,6 +40,7 @@ resource "aws_security_group" "database-sg" {
   tags = var.tags
 }
 
+/* Intentionally left until the DB upgrade finishes */
 resource "aws_db_parameter_group" "rds-mariadb-pg" {
   name   = "rds-keycloak-${var.environment}-mariadb-pg"
   family = "mariadb10.5"
@@ -57,11 +58,47 @@ resource "aws_db_parameter_group" "rds-mariadb-pg" {
   tags = var.tags
 }
 
+resource "aws_db_parameter_group" "rds-mariadb-pg-2" {
+  name   = "rds-keycloak-${var.environment}-mariadb-pg-2"
+  family = "mariadb10.6"
+
+  parameter {
+    name  = "character_set_server"
+    value = "utf8"
+  }
+
+  parameter {
+    name  = "character_set_client"
+    value = "utf8"
+  }
+
+  tags = var.tags
+}
+
+/* Intentionally left until the DB upgrade finishes */
 resource "aws_db_option_group" "rds-mariadb-og" {
   name                     = "rds-keycloak-${var.environment}-mariadb-og"
   option_group_description = "Terraform Option Group Maria DB"
   engine_name              = "mariadb"
   major_engine_version     = "10.5"
+
+  option {
+    option_name = "MARIADB_AUDIT_PLUGIN"
+
+    /*option_settings {
+      name  = "SERVER_AUDIT_LOGGING"
+      value = "ON"
+    }*/
+  }
+
+  tags = var.tags
+}
+
+resource "aws_db_option_group" "rds-mariadb-og-2" {
+  name                     = "rds-keycloak-${var.environment}-mariadb-og-2"
+  option_group_description = "Terraform Option Group Maria DB"
+  engine_name              = "mariadb"
+  major_engine_version     = "10.6"
 
   option {
     option_name = "MARIADB_AUDIT_PLUGIN"
@@ -81,13 +118,13 @@ resource "aws_db_instance" "keycloak-database-engine" {
   allocated_storage       = 20
   max_allocated_storage   = 100
   engine                  = "mariadb"
-  engine_version          = "10.5"
+  engine_version          = "10.6"
   instance_class          = "db.t3.micro"
   db_subnet_group_name    = local.db_subnet_group
   multi_az                = true
   username                = var.db_username
-  parameter_group_name    = "rds-keycloak-${var.environment}-mariadb-pg"
-  option_group_name       = "rds-keycloak-${var.environment}-mariadb-og"
+  parameter_group_name    = "rds-keycloak-${var.environment}-mariadb-pg-2"
+  option_group_name       = "rds-keycloak-${var.environment}-mariadb-og-2"
   vpc_security_group_ids  = [aws_security_group.database-sg.id]
   skip_final_snapshot     = true
   monitoring_interval     = 15
@@ -107,5 +144,5 @@ resource "aws_db_instance" "keycloak-database-engine" {
 
   tags = var.tags
 
-  depends_on = [aws_db_option_group.rds-mariadb-og, aws_db_parameter_group.rds-mariadb-pg, aws_iam_role.keycloak-db-monitoring-role]
+  depends_on = [aws_db_option_group.rds-mariadb-og-2, aws_db_parameter_group.rds-mariadb-pg-2, aws_iam_role.keycloak-db-monitoring-role]
 }
