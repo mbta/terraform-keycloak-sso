@@ -82,6 +82,12 @@ variable "lb_access_logs_s3_bucket" {
   default     = null
 }
 
+variable "lb_web_acl_arn" {
+  type        = string
+  default     = null
+  description = "The ARN of a WAFv2 Web ACL to attach to the environment's load balancer"
+}
+
 variable "log_driver" {
   type        = string
   description = "(optional) ECS log driver for task log configuration. Supported options are 'awslogs' and 'splunk'"
