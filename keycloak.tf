@@ -101,7 +101,18 @@ resource "aws_ecs_task_definition" "keycloak-ecs-taskdef" {
       ],
       "cpu": ${local.keycloak_task_cpu},
       "memory": ${local.keycloak_task_memory},
-      "networkMode": "awsvpc"
+      "networkMode": "awsvpc",
+      "stopTimeout": 120,
+      "healthCheck": {
+              "retries": 3,
+              "command": [
+                  "CMD-SHELL",
+                  "cat /proc/net/tcp6 | grep '00000000000000000000000000000000:1F90 00000000000000000000000000000000:0000' || exit 1"
+              ],
+              "timeout": 5,
+              "interval": 30,
+              "startPeriod": 30
+       }
     }
   ]
   DEFINITION
