@@ -3,9 +3,10 @@
 
 provider "registry.opentofu.org/hashicorp/aws" {
   version     = "6.25.0"
-  constraints = ">= 5.86.0"
+  constraints = "~> 6.0"
   hashes = [
     "h1:3E+87JUqfObP3vIjmk0xEE99GKoYhMzVZjbWiTvXVbI=",
+    "h1:cGns992yyrMXWRHpnX4rhWIL1ztMQyxmEGGWzAikqf4=",
     "zh:02185f69b713b988622c4ccf987bf2b9ad74adbbf7535d0d9268b8e0ec642616",
     "zh:114080dc48cdd11e372d59de456b3b1be562dcd8b4bc3b66b70c589697f3bcb7",
     "zh:3e1894fff90dc70d1ef68f6274ca1091d90b64ece688b32defc414eda56c4b7f",
@@ -22,6 +23,7 @@ provider "registry.opentofu.org/hashicorp/random" {
   version = "3.7.2"
   hashes = [
     "h1:cFGCdxTlsrteTiaOV/iOQdql7eJkD3F/vtJxenkj9IE=",
+    "h1:rdpkD+Rzr+KCPqOvb1ckzupjWCOum/boRX4FqVboAHQ=",
     "zh:2ffeb1058bd7b21a9e15a5301abb863053a2d42dffa3f6cf654a1667e10f4727",
     "zh:519319ed8f4312ed76519652ad6cd9f98bc75cf4ec7990a5684c072cf5dd0a5d",
     "zh:7371c2cc28c94deb9dba62fbac2685f7dde47f93019273a758dd5a2794f72919",
@@ -38,6 +40,7 @@ provider "registry.opentofu.org/hashicorp/random" {
 provider "registry.opentofu.org/hashicorp/tls" {
   version = "4.1.0"
   hashes = [
+    "h1:E9RjaL6cn8U/IkzfNcmrf/9EtMGjJnwUeXpx85sOGRg=",
     "h1:yNZuPWUgw6Ik2huf9lhsuCGONWo2rsY1MfeceT0BQpw=",
     "zh:187a99f0d236fd92da224e2f026c4ca8f1dcbf2b5cddc8e6896801bacfab0d73",
     "zh:61a32a01cc46f382014dcf7aff5bcac61fe97bd69d3ccb51c801e9437ecdb9ce",

@@ -167,13 +167,20 @@ variable "ecr_keycloak_image_entrypoint" {
   description = "Optional ENTRYPOINT for the Keycloak image."
   default     = []
 }
+
 variable "set_passwords" {
   type        = bool
   description = "If true, automatically set the admin/DB passwords."
   default     = false
 }
+
 variable "is_temporary" {
   type        = bool
   description = "If true, support quick termination of created resources."
+}
+
+variable "allow_major_version_upgrade" {
+  type        = bool
+  description = "Whether to allow major version upgrades for the RDS instance."
   default     = false
 }
