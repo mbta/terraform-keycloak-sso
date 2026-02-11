@@ -29,10 +29,14 @@ resource "aws_ecs_cluster" "keycloak-cluster" {
 }
 
 resource "aws_security_group" "keycloak-sg" {
-  vpc_id = var.vpc_id
-  name   = "keycloak-${var.environment}-sg"
+  vpc_id      = var.vpc_id
+  name        = "keycloak-${var.environment}-sg"
+  description = "Security group for Keycloak tasks"
+
+  # checkov:skip=CKV_AWS_382:tasks need to access the internet (TODO)
 
   ingress {
+    description     = "Allow incoming requests from the loadbalancer"
     from_port       = 0
     to_port         = 0
     protocol        = "-1"
@@ -40,6 +44,7 @@ resource "aws_security_group" "keycloak-sg" {
   }
 
   egress {
+    description      = "Allow external traffic to the internet"
     from_port        = 0
     to_port          = 0
     protocol         = "-1"
@@ -64,7 +69,7 @@ resource "aws_ecs_task_definition" "keycloak-ecs-taskdef" {
         {"name":"KC_DB", "value":"mariadb"},
         {"name":"KC_DB_URL_HOST", "value":"${aws_db_instance.keycloak-database-engine.endpoint}"},
         {"name":"KC_DB_URL_DATABASE", "value":"${var.db_name}"},
-        {"name":"KC_DB_URL_PROPERTIES", "value":"?autoReconnect=true"},
+        {"name":"KC_DB_URL_PROPERTIES", "value":"?autoReconnect=true&sslMode=trust"},
         {"name":"KC_DB_USERNAME", "value":"${var.db_username}"},
         {"name":"KC_HTTP_RELATIVE_PATH", "value":"/auth"},
         {"name":"KC_HOSTNAME_STRICT", "value":"false"},
@@ -121,8 +126,8 @@ resource "aws_ecs_task_definition" "keycloak-ecs-taskdef" {
   network_mode             = "awsvpc"
   memory                   = local.keycloak_task_memory
   cpu                      = local.keycloak_task_cpu
-  execution_role_arn       = aws_iam_role.keycloak-ecs-execution-task-role.arn
-  task_role_arn            = aws_iam_role.keycloak-ecs-execution-task-role.arn
+  execution_role_arn       = aws_iam_role.keycloak_ecs_execution_role.arn
+  task_role_arn            = aws_iam_role.keycloak_ecs_task_role.arn
 
   tags = var.tags
 
@@ -165,6 +170,10 @@ resource "aws_ecs_service" "keycloak-service" {
 
   tags = var.tags
 
-  depends_on = [aws_lb_listener.keycloak-listener, aws_iam_role.keycloak-ecs-execution-task-role, aws_db_instance.keycloak-database-engine]
+  depends_on = [
+    aws_lb_listener.keycloak-listener,
+    aws_iam_role.keycloak_ecs_execution_role,
+    aws_iam_role.keycloak_ecs_task_role,
+  aws_db_instance.keycloak-database-engine]
 }
 

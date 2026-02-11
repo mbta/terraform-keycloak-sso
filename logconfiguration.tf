@@ -37,5 +37,7 @@ resource "aws_cloudwatch_log_group" "keycloak-log-group" {
   name              = "keycloak-${var.environment}-logs"
   retention_in_days = 30
 
+  # checkov:skip=CKV_AWS_338:logs are retained elsewhere
+  # checkov:skip=CKV_AWS_158:don't bother with encrypting logs TODO
   tags = var.tags
 }

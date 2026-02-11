@@ -19,22 +19,16 @@ resource "aws_db_subnet_group" "keycloak-database-subnet" {
 }
 
 resource "aws_security_group" "database-sg" {
-  vpc_id = var.vpc_id
-  name   = "keycloak-${var.environment}-database-sg"
+  vpc_id      = var.vpc_id
+  name        = "keycloak-${var.environment}-database-sg"
+  description = "Inbound connections to the Keycloak database"
+
   ingress {
     description     = "MariaDB port"
     from_port       = 3306
     to_port         = 3306
     protocol        = "tcp"
     security_groups = [aws_security_group.keycloak-sg.id]
-  }
-
-  egress {
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
   }
 
   tags = var.tags
@@ -55,6 +49,11 @@ resource "aws_db_parameter_group" "rds-mariadb-pg" {
     value = "utf8"
   }
 
+  parameter {
+    name  = "require_secure_transport"
+    value = "1"
+  }
+
   tags = var.tags
 }
 
@@ -70,6 +69,12 @@ resource "aws_db_parameter_group" "rds-mariadb-pg-2" {
   parameter {
     name  = "character_set_client"
     value = "utf8"
+  }
+
+  # Ensure the RDS instance is configured with encryption in transit
+  parameter {
+    name  = "require_secure_transport"
+    value = "1"
   }
 
   tags = var.tags
@@ -119,24 +124,31 @@ resource "aws_db_instance" "keycloak-database-engine" {
   max_allocated_storage       = 100
   engine                      = "mariadb"
   engine_version              = "10.6"
+  auto_minor_version_upgrade  = true
   instance_class              = "db.t3.micro"
   db_subnet_group_name        = local.db_subnet_group
   multi_az                    = true
   username                    = var.db_username
-  parameter_group_name        = "rds-keycloak-${var.environment}-mariadb-pg-2"
-  option_group_name           = "rds-keycloak-${var.environment}-mariadb-og-2"
+  parameter_group_name        = aws_db_parameter_group.rds-mariadb-pg-2.name
+  option_group_name           = aws_db_option_group.rds-mariadb-og-2.name
   vpc_security_group_ids      = [aws_security_group.database-sg.id]
   skip_final_snapshot         = true
   monitoring_interval         = 15
   monitoring_role_arn         = aws_iam_role.keycloak-db-monitoring-role.arn
   storage_encrypted           = true
   backup_retention_period     = var.is_temporary ? 0 : var.backup_retention_period
+  copy_tags_to_snapshot       = true
+  deletion_protection         = !var.is_temporary
   allow_major_version_upgrade = var.allow_major_version_upgrade
 
   # this value leaks into state and thus should be changed on creation.
   # any changes are ignored by the lifecycle policy below.
   password = random_password.database-password.result
 
+  # checkov:skip=CKV_AWS_129:not bothering with database logs TODO
+  # checkov:skip=CKV_AWS_293:deletion protection enabled for non-temporary databases
+  # checkov:skip=CKV_AWS_133:backups are configurable
+  # checkov skip=CKV_AWS_226:not allowing au
   lifecycle {
     ignore_changes = [
       password,

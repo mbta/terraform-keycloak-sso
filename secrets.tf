@@ -18,6 +18,8 @@ resource "aws_secretsmanager_secret" "keycloak-admin-password" {
   name                    = "keycloak-${var.environment}-admin-password"
   recovery_window_in_days = var.is_temporary ? 0 : 30
 
+  # checkov:skip=CKV_AWS_149:encrypting with AWS keys is fine for now TODO
+  # checkov:skip=CKV2_AWS_57:don't need rotation
   tags = var.tags
 }
 
@@ -31,6 +33,8 @@ resource "aws_secretsmanager_secret" "keycloak-database-password" {
   name                    = "keycloak-${var.environment}-db-password"
   recovery_window_in_days = var.is_temporary ? 0 : 30
 
+  # checkov:skip=CKV_AWS_149:encrypting with AWS keys is fine for now TODO
+  # checkov:skip=CKV2_AWS_57:don't need rotation
   tags = var.tags
 }
 
@@ -42,5 +46,7 @@ resource "aws_secretsmanager_secret" "keycloak-splunk-token" {
   description             = "Keycloak Splunk HTTP Event Collector token"
   recovery_window_in_days = var.is_temporary ? 0 : 30
 
+  # checkov:skip=CKV_AWS_149:encrypting with AWS keys is fine for now TODO
+  # checkov:skip=CKV2_AWS_57:don't need rotation
   tags = var.tags
 }

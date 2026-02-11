@@ -13,15 +13,22 @@ data "aws_iam_policy_document" "assume_role_policy" {
   }
 }
 
-resource "aws_iam_role" "keycloak-ecs-execution-task-role" {
-  name               = "keycloak-${var.environment}-ecs-execution-task-role"
+resource "aws_iam_role" "keycloak_ecs_execution_role" {
+  name               = "keycloak-${var.environment}-ecs-execution-role"
   assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
 
   tags = var.tags
 }
 
-resource "aws_iam_role_policy_attachment" "ecs-execution-task-policy" {
-  role       = aws_iam_role.keycloak-ecs-execution-task-role.name
+resource "aws_iam_role" "keycloak_ecs_task_role" {
+  name               = "keycloak-${var.environment}-ecs-task-role"
+  assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
+
+  tags = var.tags
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_execution_policy" {
+  role       = aws_iam_role.keycloak_ecs_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
 }
 
@@ -54,7 +61,7 @@ resource "aws_iam_role_policy_attachment" "keycloak-db-monitoring-role" {
 # inline policy for Secrets Manager access, attached to the task execution role created by the ECS module
 resource "aws_iam_role_policy" "inline-keycloak-secretsmanager" {
   name   = "secretsmanager-keycloak-${var.environment}"
-  role   = aws_iam_role.keycloak-ecs-execution-task-role.name
+  role   = aws_iam_role.keycloak_ecs_execution_role.name
   policy = data.aws_iam_policy_document.inline-keycloak-secretsmanager-doc.json
 }
 
@@ -77,7 +84,7 @@ data "aws_iam_policy_document" "inline-keycloak-secretsmanager-doc" {
 resource "aws_iam_role_policy" "keycloak_to_app_user_updates_publish" {
   count  = length(var.applications_to_update) > 0 ? 1 : 0
   name   = "keycloak-${var.environment}-app-user-updates-publish"
-  role   = aws_iam_role.keycloak-ecs-execution-task-role.name
+  role   = aws_iam_role.keycloak_ecs_task_role.name
   policy = data.aws_iam_policy_document.keycloak_to_app_user_updates_publish.json
 }
 

@@ -12,10 +12,12 @@ locals {
 }
 
 resource "aws_security_group" "keycloak-load-balancer-sg" {
-  vpc_id = var.vpc_id
-  name   = "keycloak-${var.environment}-load-balancer-sg"
+  vpc_id      = var.vpc_id
+  name        = "keycloak-${var.environment}-load-balancer-sg"
+  description = "Security group for the Keycloak loadbalancer"
 
   ingress {
+    description      = "Allow incoming HTTPS traffic"
     from_port        = 443
     to_port          = 443
     protocol         = "tcp"
@@ -23,24 +25,26 @@ resource "aws_security_group" "keycloak-load-balancer-sg" {
     ipv6_cidr_blocks = ["::/0"]
   }
 
-  egress {
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-  }
-
   tags = var.tags
 }
 
-resource "aws_alb" "keycloak-load-balancer" {
-  name               = "keycloak-${var.environment}-alb"
-  internal           = false
-  load_balancer_type = "application"
-  subnets            = var.public_subnets
-  security_groups    = [aws_security_group.keycloak-load-balancer-sg.id]
+resource "aws_vpc_security_group_egress_rule" "keycloak-load-balancer_sg" {
+  security_group_id            = aws_security_group.keycloak_load_balancer_sg.id
+  description                  = "Allow traffic to Keycloak tasks"
+  from_port                    = 8080
+  to_port                      = 9090
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = aws_security_group.keycloak-sg.id
+}
 
+resource "aws_alb" "keycloak-load-balancer" {
+  name                       = "keycloak-${var.environment}-alb"
+  internal                   = false
+  load_balancer_type         = "application"
+  subnets                    = var.public_subnets
+  security_groups            = [aws_security_group.keycloak-load-balancer-sg.id]
+  enable_deletion_protection = !var.is_temporary
+  drop_invalid_header_fields = true
 
   # LB access logs
   access_logs {
@@ -48,6 +52,13 @@ resource "aws_alb" "keycloak-load-balancer" {
     prefix  = "keycloak-${var.environment}"
     enabled = var.lb_enable_access_logs
   }
+
+  # checkov:skip=CKV_AWS_150:deletion protection enabled for non-temporary LBs
+  # checkov:skip=CKV_AWS_91:access logging is enabled if configured
+  # checkov:skip=CKV2_AWS_28:WAF not configured yet:
+  # - https://app.asana.com/1/15492006741476/project/1113179098808463/task/1201986044378966?focus=true
+  # - https://app.asana.com/1/15492006741476/project/1113179098808463/task/1212505288488894?focus=true
+  # - https://app.asana.com/1/15492006741476/project/1113179098808463/task/1201986044378968?focus=true
 
   tags = var.tags
 }
