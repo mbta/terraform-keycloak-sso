@@ -163,3 +163,9 @@ resource "aws_lb_listener_rule" "redirect_to_mbta_com" {
     Name = "Redirect-to-MBTA-page"
   })
 }
+
+resource "aws_wafv2_web_acl_association" "waf_web_acl" {
+  count        = var.lb_web_acl_arn == null ? 0 : 1
+  resource_arn = aws_alb.keycloak-load-balancer.arn
+  web_acl_arn  = var.lb_web_acl_arn
+}
