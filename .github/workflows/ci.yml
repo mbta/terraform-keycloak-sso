@@ -4,15 +4,40 @@ on:
   push:
 
 jobs:
+  tofu:
+    name: Tofu
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Read .tool-versions
+        id: tool-versions
+        run: |
+          TOFU_VERSION=$(grep opentofu .tool-versions | awk '{print $2}')
+          echo "tofu_version=$TOFU_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Setup OpenTofu
+        uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: ${{ steps.tool-versions.outputs.tofu_version }}
+
+      - name: Initialize Tofu
+        run: tofu init -backend=false
+
+      - name: Validate
+        run: tofu validate
+
   checkov:
     name: Checkov
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+
       - name: Set up Python 3.13
         uses: actions/setup-python@v4
         with:
           python-version: 3.13
+
       - name: Test with Checkov
         id: checkov
         uses: bridgecrewio/checkov-action@v12
