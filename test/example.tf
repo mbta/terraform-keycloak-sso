@@ -84,7 +84,8 @@ module "example" {
   ecr_keycloak_image_tag        = "26.3"
   ecr_keycloak_image_entrypoint = ["/opt/keycloak/bin/kc.sh", "start-dev"]
 
-  acm_hostname = "${local.name}.local"
+  hostname       = "${local.name}.local"
+  admin_hostname = "admin.${local.name}.local"
   admin_cidrs = [
     "${chomp(data.http.myip.response_body)}/32",
     "127.0.0.1/32",
