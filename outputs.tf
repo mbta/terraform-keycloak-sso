@@ -17,3 +17,11 @@ output "sqs_queues" {
 output "admin_password_secret_id" {
   value = aws_secretsmanager_secret.keycloak-admin-password.id
 }
+
+output "hostname" {
+  value = var.hostname
+}
+
+output "admin_hostname" {
+  value = coalesce(var.admin_hostname, var.hostname)
+}
