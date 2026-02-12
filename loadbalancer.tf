@@ -28,8 +28,8 @@ resource "aws_security_group" "keycloak-load-balancer-sg" {
   tags = var.tags
 }
 
-resource "aws_vpc_security_group_egress_rule" "keycloak-load-balancer_sg" {
-  security_group_id            = aws_security_group.keycloak_load_balancer_sg.id
+resource "aws_vpc_security_group_egress_rule" "keycloak_load_balancer_sg" {
+  security_group_id            = aws_security_group.keycloak-load-balancer-sg.id
   description                  = "Allow traffic to Keycloak tasks"
   from_port                    = 8080
   to_port                      = 9090
