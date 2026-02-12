@@ -55,6 +55,7 @@ resource "aws_alb" "keycloak-load-balancer" {
 
   # checkov:skip=CKV_AWS_150:deletion protection enabled for non-temporary LBs
   # checkov:skip=CKV_AWS_91:access logging is enabled if configured
+  # checkov:skip=CKV2_AWS_76:Log4J is the responsibility of the WAF
   # checkov:skip=CKV2_AWS_28:WAF not configured yet:
   # - https://app.asana.com/1/15492006741476/project/1113179098808463/task/1201986044378966?focus=true
   # - https://app.asana.com/1/15492006741476/project/1113179098808463/task/1212505288488894?focus=true
