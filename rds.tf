@@ -20,7 +20,7 @@ resource "aws_db_subnet_group" "keycloak-database-subnet" {
 
 resource "aws_security_group" "database-sg" {
   vpc_id      = var.vpc_id
-  name        = "keycloak-${var.environment}-database-sg"
+  name_prefix = "keycloak-${var.environment}-database-sg"
   description = "Inbound connections to the Keycloak database"
 
   ingress {
@@ -31,7 +31,13 @@ resource "aws_security_group" "database-sg" {
     security_groups = [aws_security_group.keycloak-sg.id]
   }
 
-  tags = var.tags
+  tags = merge(var.tags, {
+    Name = "keycloak-${var.environment}-database-sg"
+  })
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 /* Intentionally left until the DB upgrade finishes */
