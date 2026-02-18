@@ -31,7 +31,7 @@ resource "aws_ecs_cluster" "keycloak-cluster" {
 
 resource "aws_security_group" "keycloak-sg" {
   vpc_id      = var.vpc_id
-  name        = "keycloak-${var.environment}-sg"
+  name_prefix = "keycloak-${var.environment}-sg-"
   description = "Security group for Keycloak tasks"
 
   # checkov:skip=CKV_AWS_382:tasks need to access the internet (TODO)
@@ -53,7 +53,13 @@ resource "aws_security_group" "keycloak-sg" {
     ipv6_cidr_blocks = ["::/0"]
   }
 
-  tags = var.tags
+  tags = merge(var.tags, {
+    Name = "keycloak-${var.environment}-sg"
+  })
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_ecs_task_definition" "keycloak-ecs-taskdef" {

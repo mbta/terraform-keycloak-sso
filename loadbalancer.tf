@@ -13,7 +13,7 @@ locals {
 
 resource "aws_security_group" "keycloak-load-balancer-sg" {
   vpc_id      = var.vpc_id
-  name        = "keycloak-${var.environment}-load-balancer-sg"
+  name_prefix = "keycloak-${var.environment}-load-balancer-sg-"
   description = "Security group for the Keycloak loadbalancer"
 
   ingress {
@@ -25,7 +25,13 @@ resource "aws_security_group" "keycloak-load-balancer-sg" {
     ipv6_cidr_blocks = ["::/0"]
   }
 
-  tags = var.tags
+  tags = merge(var.tags, {
+    Name = "keycloak-${var.environment}-load-balancer-sg"
+  })
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_vpc_security_group_egress_rule" "keycloak_load_balancer_sg" {
