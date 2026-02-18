@@ -20,7 +20,7 @@ resource "aws_db_subnet_group" "keycloak-database-subnet" {
 
 resource "aws_security_group" "database-sg" {
   vpc_id      = var.vpc_id
-  name_prefix = "keycloak-${var.environment}-database-sg"
+  name_prefix = "keycloak-${var.environment}-database-sg-"
   description = "Inbound connections to the Keycloak database"
 
   ingress {

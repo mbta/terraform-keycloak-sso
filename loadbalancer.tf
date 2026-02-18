@@ -13,7 +13,7 @@ locals {
 
 resource "aws_security_group" "keycloak-load-balancer-sg" {
   vpc_id      = var.vpc_id
-  name_prefix = "keycloak-${var.environment}-load-balancer-sg"
+  name_prefix = "keycloak-${var.environment}-load-balancer-sg-"
   description = "Security group for the Keycloak loadbalancer"
 
   ingress {

@@ -31,7 +31,7 @@ resource "aws_ecs_cluster" "keycloak-cluster" {
 
 resource "aws_security_group" "keycloak-sg" {
   vpc_id      = var.vpc_id
-  name_prefix = "keycloak-${var.environment}-sg"
+  name_prefix = "keycloak-${var.environment}-sg-"
   description = "Security group for Keycloak tasks"
 
   # checkov:skip=CKV_AWS_382:tasks need to access the internet (TODO)
