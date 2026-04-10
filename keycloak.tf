@@ -153,6 +153,7 @@ resource "aws_ecs_service" "keycloak-service" {
   scheduling_strategy  = "REPLICA"
   desired_count        = 2
   force_new_deployment = true
+  deployment_maximum_percent = 150
 
   network_configuration {
     subnets          = var.private_subnets
