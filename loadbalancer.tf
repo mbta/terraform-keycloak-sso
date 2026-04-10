@@ -1,7 +1,6 @@
 locals {
   # get these values from either input variables, or internal resources if the variables weren't passed
   certificate_arn = var.acm_certificate_arn == null ? join("", aws_acm_certificate.keycloak-certificate.*.arn) : var.acm_certificate_arn
-  lb_log_bucket   = var.lb_access_logs_s3_bucket == null ? join("", aws_s3_bucket.keycloak-lb-access-logs.*.id) : var.lb_access_logs_s3_bucket
 
   admin_paths = [
     "/auth/realms/master/*",
@@ -53,10 +52,15 @@ resource "aws_alb" "keycloak-load-balancer" {
   drop_invalid_header_fields = true
 
   # LB access logs
-  access_logs {
-    bucket  = local.lb_log_bucket
-    prefix  = "keycloak-${var.environment}"
-    enabled = var.lb_enable_access_logs
+  # Only generate this block if var.lb_access_logs_s3_bucket was specified
+  dynamic "access_logs" {
+    for_each = var.lb_access_logs_s3_bucket == null ? [] : [var.lb_access_logs_s3_bucket]
+    iterator = bucket
+    content {
+      bucket  = bucket.value
+      prefix  = "keycloak-${var.environment}"
+      enabled = true
+    }
   }
 
   # checkov:skip=CKV_AWS_150:deletion protection enabled for non-temporary LBs
