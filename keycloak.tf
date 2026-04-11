@@ -44,6 +44,23 @@ resource "aws_security_group" "keycloak-sg" {
     security_groups = [aws_security_group.keycloak-load-balancer-sg.id]
   }
 
+  # https://www.keycloak.org/server/caching#network-ports
+  ingress {
+    description = "allow inter-process communication for Infinispan dbc-ping"
+    from_port   = 7800
+    to_port     = 7800
+    protocol    = "tcp"
+    self        = true
+  }
+
+  ingress {
+    description = "allow inter-process communication for Infinispan dbc-ping"
+    from_port   = 57800
+    to_port     = 57800
+    protocol    = "tcp"
+    self        = true
+  }
+
   egress {
     description      = "Allow external traffic to the internet"
     from_port        = 0
@@ -105,12 +122,16 @@ resource "aws_ecs_task_definition" "keycloak-ecs-taskdef" {
           "hostPort": 8080
         },
         {
-          "containerPort": 7600,
-          "hostPort": 7600
+          "containerPort": 7800,
+          "hostPort": 7800
         },
         {
           "containerPort": 9000,
           "hostPort": 9000
+        },
+        {
+          "containerPort": 57800,
+          "hostPort": 57800
         }
       ],
       "cpu": ${local.keycloak_task_cpu},
