@@ -46,7 +46,7 @@ resource "aws_security_group" "keycloak-sg" {
 
   # https://www.keycloak.org/server/caching#network-ports
   ingress {
-    description = "allow inter-process communication for Infinispan dbc-ping"
+    description = "allow communication for distributed caching using Infinispan + jdbc-ping"
     from_port   = 7800
     to_port     = 7800
     protocol    = "tcp"
@@ -54,7 +54,7 @@ resource "aws_security_group" "keycloak-sg" {
   }
 
   ingress {
-    description = "allow inter-process communication for Infinispan dbc-ping"
+    description = "allow failure detection for distributed caching using Infinispan + jdbc-ping"
     from_port   = 57800
     to_port     = 57800
     protocol    = "tcp"
