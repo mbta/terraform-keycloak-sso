@@ -2,28 +2,50 @@
 name: CI
 on:
   push:
+    branches-ignore:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
+  zizmor:
+    name: Run zizmor 🌈
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - name: Run zizmor 🌈
+        uses: zizmorcore/zizmor-action@192e21d79ab29983730a13d1382995c2307fbcaa # v0.5.7
+        with:
+          persona: pedantic
+          advanced-security: false
+          annotations: true
   tofu:
     name: Tofu
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
       - name: Read .tool-versions
         id: tool-versions
         run: |
           TOFU_VERSION=$(grep opentofu .tool-versions | awk '{print $2}')
           echo "tofu_version=$TOFU_VERSION" >> $GITHUB_OUTPUT
-
       - name: Setup OpenTofu
-        uses: opentofu/setup-opentofu@v1
+        uses: opentofu/setup-opentofu@847eaa4afeb791b06daa46e8eafa8b1b68d7cfb4 # v2.0.1
         with:
           tofu_version: ${{ steps.tool-versions.outputs.tofu_version }}
-
       - name: Initialize Tofu
         run: tofu init -backend=false
-
       - name: Validate
         run: tofu validate
 
@@ -31,16 +53,17 @@ jobs:
     name: Checkov
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
       - name: Set up Python 3.13
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
           python-version: 3.13
-
       - name: Test with Checkov
         id: checkov
-        uses: bridgecrewio/checkov-action@v12
+        uses: bridgecrewio/checkov-action@063da70420ab562cb31f661b374a76b6a42ed6b5 # v12.3108.0
         with:
           directory: .
           skip_path: test
