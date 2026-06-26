@@ -2,9 +2,15 @@
 name: CI
 on:
   push:
+    branches-ignore:
+      - main
 
 permissions:
   contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   zizmor:
@@ -18,6 +24,7 @@ jobs:
       - name: Run zizmor 🌈
         uses: zizmorcore/zizmor-action@192e21d79ab29983730a13d1382995c2307fbcaa # v0.5.7
         with:
+          persona: pedantic
           advanced-security: false
           annotations: true
   tofu:
