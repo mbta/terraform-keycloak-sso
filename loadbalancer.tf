@@ -59,6 +59,7 @@ resource "aws_alb" "keycloak-load-balancer" {
     enabled = var.lb_enable_access_logs
   }
 
+  # checkov:skip=CKV_AWS_378:TLS is not set up behind the loadbalancer currently
   # checkov:skip=CKV_AWS_150:deletion protection enabled for non-temporary LBs
   # checkov:skip=CKV_AWS_91:access logging is enabled if configured
   # checkov:skip=CKV2_AWS_76:Log4J is the responsibility of the WAF
@@ -94,6 +95,54 @@ resource "aws_lb_target_group" "keycloak-target-group" {
   }
 
   tags = var.tags
+}
+
+resource "aws_lb_target_group" "keycloak-target-group-green" {
+  name        = "keycloak-${var.environment}-target-group-green"
+  port        = 8080
+  protocol    = "HTTP"
+  target_type = "ip"
+  vpc_id      = var.vpc_id
+
+  stickiness {
+    enabled = true
+    type    = "lb_cookie"
+  }
+
+  health_check {
+    healthy_threshold   = "3"
+    interval            = "30"
+    protocol            = "HTTP"
+    matcher             = "200"
+    timeout             = "10"
+    path                = "/auth/health"
+    port                = 9000
+    unhealthy_threshold = "3"
+  }
+
+  tags = var.tags
+}
+
+resource "aws_lb_listener_rule" "deployment_listener_rule" {
+  listener_arn = aws_lb_listener.keycloak-listener.arn
+  priority     = 100
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.keycloak-target-group.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/*"]
+    }
+  }
+
+  lifecycle {
+    ignore_changes = [
+      action[0].target_group_arn,
+    ]
+  }
 }
 
 

@@ -167,14 +167,18 @@ resource "aws_ecs_task_definition" "keycloak-ecs-taskdef" {
 }
 
 resource "aws_ecs_service" "keycloak-service" {
-  name                       = "keycloak-${var.environment}"
-  cluster                    = local.keycloak_ecs_cluster_arn
-  task_definition            = aws_ecs_task_definition.keycloak-ecs-taskdef.arn
-  launch_type                = "FARGATE"
-  scheduling_strategy        = "REPLICA"
-  desired_count              = 2
-  force_new_deployment       = true
-  deployment_maximum_percent = 150
+  name                 = "keycloak-${var.environment}"
+  cluster              = local.keycloak_ecs_cluster_arn
+  task_definition      = aws_ecs_task_definition.keycloak-ecs-taskdef.arn
+  launch_type          = "FARGATE"
+  scheduling_strategy  = "REPLICA"
+  desired_count        = 2
+  force_new_deployment = true
+
+  deployment_configuration {
+    strategy             = "BLUE_GREEN"
+    bake_time_in_minutes = 15
+  }
 
   network_configuration {
     subnets          = var.private_subnets
@@ -189,12 +193,19 @@ resource "aws_ecs_service" "keycloak-service" {
     target_group_arn = aws_lb_target_group.keycloak-target-group.arn
     container_name   = "keycloak-${var.environment}"
     container_port   = 8080
+
+    advanced_configuration {
+      alternate_target_group_arn = aws_lb_target_group.keycloak-target-group-green.arn
+      production_listener_rule   = aws_lb_listener_rule.deployment_listener_rule.arn
+      role_arn                   = aws_iam_role.keycloak_ecs_alb_management_role.arn
+    }
   }
 
   lifecycle {
     create_before_destroy = true
     ignore_changes = [
       desired_count,
+      load_balancer,
       task_definition,
     ]
   }
@@ -205,6 +216,7 @@ resource "aws_ecs_service" "keycloak-service" {
     aws_lb_listener.keycloak-listener,
     aws_iam_role.keycloak_ecs_execution_role,
     aws_iam_role.keycloak_ecs_task_role,
-  aws_db_instance.keycloak-database-engine]
+    aws_db_instance.keycloak-database-engine,
+  ]
 }
 
