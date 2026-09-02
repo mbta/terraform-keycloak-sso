@@ -52,7 +52,7 @@ resource "aws_iam_role" "keycloak_ecs_alb_management_role" {
 
 resource "aws_iam_role_policy_attachment" "ecs_alb_management_policy" {
   role       = aws_iam_role.keycloak_ecs_alb_management_role.name
-  policy_arn = "arn:aws:iam::aws:policy/aws-service-role/AmazonECSInfrastructureRolePolicyForLoadBalancers"
+  policy_arn = "arn:aws:iam::aws:policy/AmazonECSInfrastructureRolePolicyForLoadBalancers"
 }
 
 # IAM Role for RDS Enhanced Monitoring

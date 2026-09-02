@@ -126,7 +126,7 @@ resource "aws_lb_target_group" "keycloak-target-group-green" {
 
 resource "aws_lb_listener_rule" "deployment_listener_rule" {
   listener_arn = aws_lb_listener.keycloak-listener.arn
-  priority     = 100
+  priority     = 200
 
   action {
     type             = "forward"
