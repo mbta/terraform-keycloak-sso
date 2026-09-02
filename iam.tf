@@ -32,6 +32,29 @@ resource "aws_iam_role_policy_attachment" "ecs_execution_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
 }
 
+data "aws_iam_policy_document" "ecs_assume_role_policy" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["ecs.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "keycloak_ecs_alb_management_role" {
+  name               = "keycloak-${var.environment}-ecs-alb-management-role"
+  assume_role_policy = data.aws_iam_policy_document.ecs_assume_role_policy.json
+
+  tags = var.tags
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_alb_management_policy" {
+  role       = aws_iam_role.keycloak_ecs_alb_management_role.name
+  policy_arn = "arn:aws:iam::aws:policy/aws-service-role/AmazonECSInfrastructureRolePolicyForLoadBalancers"
+}
+
 # IAM Role for RDS Enhanced Monitoring
 resource "aws_iam_role" "keycloak-db-monitoring-role" {
 
