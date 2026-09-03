@@ -99,7 +99,7 @@ resource "aws_lb_target_group" "keycloak-target-group" {
 
 resource "aws_lb_target_group" "keycloak-target-group-green" {
   # checkov:skip=CKV_AWS_378:TLS is not set up behind the loadbalancer currently
-  name        = "keycloak-${var.environment}-target-group-green"
+  name        = "keycloak-${var.environment}-target-group-gr"
   port        = 8080
   protocol    = "HTTP"
   target_type = "ip"

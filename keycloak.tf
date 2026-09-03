@@ -205,7 +205,12 @@ resource "aws_ecs_service" "keycloak-service" {
     create_before_destroy = true
     ignore_changes = [
       desired_count,
-      load_balancer,
+      # =======================================================================================
+      # The loadbalancer target group is dynamic based on deployment when utilizing Blue/Green deployments, so we need to ignore it
+      # in terraform management, however because we are modifying existing services, the load balancer already exists and tf won't change it
+      # We need to first manage the load-balancer in terraform before ignoring it after Blue/Green deployments are modified
+      # =======================================================================================
+      # load_balancer,
       task_definition,
     ]
   }
