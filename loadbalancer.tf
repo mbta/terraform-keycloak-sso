@@ -130,7 +130,22 @@ resource "aws_lb_listener_rule" "deployment_listener_rule" {
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.keycloak-target-group.arn
+    forward {
+      target_group {
+        arn    = aws_lb_target_group.keycloak-target-group.arn
+        weight = 100 
+      }
+
+      target_group {
+        arn    = aws_lb_target_group.keycloak-target-group-green.arn
+        weight = 0   
+      }
+
+      stickiness {
+        enabled  = true
+        duration = 3600 
+      }
+    }
   }
 
   condition {
@@ -141,7 +156,7 @@ resource "aws_lb_listener_rule" "deployment_listener_rule" {
 
   lifecycle {
     ignore_changes = [
-      action[0].target_group_arn,
+      # action[0].target_group_arn,
     ]
   }
 }
