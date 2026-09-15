@@ -177,7 +177,7 @@ resource "aws_ecs_service" "keycloak-service" {
 
   deployment_configuration {
     strategy             = "BLUE_GREEN"
-    bake_time_in_minutes = 15
+    bake_time_in_minutes = local.DEPLOYMENT_BAKETIME / 60
   }
 
   network_configuration {

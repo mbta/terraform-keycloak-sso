@@ -9,6 +9,9 @@ locals {
   ]
   # ALB rules can only have 5 items in them, and we also have a host header rule, so limit them to 5 - 1
   admin_cidrs_chunked = var.admin_cidrs == null ? [] : chunklist(var.admin_cidrs, 4)
+
+  # How long a deployment should take
+  DEPLOYMENT_BAKETIME = 900
 }
 
 resource "aws_security_group" "keycloak-load-balancer-sg" {
@@ -78,9 +81,13 @@ resource "aws_lb_target_group" "keycloak-target-group" {
   target_type = "ip"
   vpc_id      = var.vpc_id
 
+  # Purposely larger than stickiness duration to prevent ECS from destroying instances in this group until all clients move over
+  deregistration_delay = local.DEPLOYMENT_BAKETIME * 2
+
   stickiness {
-    enabled = true
-    type    = "lb_cookie"
+    enabled         = true
+    type            = "lb_cookie"
+    cookie_duration = local.DEPLOYMENT_BAKETIME
   }
 
   health_check {
@@ -105,9 +112,13 @@ resource "aws_lb_target_group" "keycloak-target-group-green" {
   target_type = "ip"
   vpc_id      = var.vpc_id
 
+  # Purposely larger than stickiness duration to prevent ECS from destroying instances in this group until all clients move over
+  deregistration_delay = local.DEPLOYMENT_BAKETIME * 2
+
   stickiness {
-    enabled = true
-    type    = "lb_cookie"
+    enabled         = true
+    type            = "lb_cookie"
+    cookie_duration = local.DEPLOYMENT_BAKETIME
   }
 
   health_check {
@@ -132,18 +143,11 @@ resource "aws_lb_listener_rule" "deployment_listener_rule" {
     type             = "forward"
     forward {
       target_group {
-        arn    = aws_lb_target_group.keycloak-target-group.arn
-        weight = 100 
+        arn = aws_lb_target_group.keycloak-target-group.arn
       }
-
-      target_group {
-        arn    = aws_lb_target_group.keycloak-target-group-green.arn
-        weight = 0   
-      }
-
       stickiness {
         enabled  = true
-        duration = 3600 
+        duration = local.DEPLOYMENT_BAKETIME
       }
     }
   }
