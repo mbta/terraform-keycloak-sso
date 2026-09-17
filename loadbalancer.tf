@@ -86,8 +86,7 @@ resource "aws_lb_target_group" "keycloak-target-group" {
 
   stickiness {
     enabled         = true
-    type            = "lb_cookie"
-    cookie_duration = local.DEPLOYMENT_BAKETIME
+    type            = "app_cookie"
   }
 
   health_check {
@@ -117,8 +116,7 @@ resource "aws_lb_target_group" "keycloak-target-group-green" {
 
   stickiness {
     enabled         = true
-    type            = "lb_cookie"
-    cookie_duration = local.DEPLOYMENT_BAKETIME
+    type            = "app_cookie"
   }
 
   health_check {
@@ -147,7 +145,7 @@ resource "aws_lb_listener_rule" "deployment_listener_rule" {
       }
       stickiness {
         enabled  = true
-        duration = local.DEPLOYMENT_BAKETIME
+        duration = 1 # set the minimum possible stickiness as we want instant rollover during deployments
       }
     }
   }
