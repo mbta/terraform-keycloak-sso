@@ -140,7 +140,7 @@ resource "aws_lb_listener_rule" "deployment_listener_rule" {
   priority     = 200
 
   action {
-    type             = "forward"
+    type = "forward"
     forward {
       target_group {
         arn = aws_lb_target_group.keycloak-target-group.arn
@@ -203,7 +203,7 @@ resource "aws_lb_listener_rule" "forward_admin_from_cidrs" {
 }
 
 resource "aws_lb_listener_rule" "redirect_admin_from_other_cidrs" {
-  count        = var.admin_cidrs == null ? 0 : 1
+  for_each     = toset(var.admin_cidrs != null ? [""] : [])
   listener_arn = aws_lb_listener.keycloak-listener.arn
   priority     = 60
 
@@ -252,7 +252,7 @@ resource "aws_lb_listener_rule" "redirect_to_mbta_com" {
 }
 
 resource "aws_wafv2_web_acl_association" "waf_web_acl" {
-  count        = var.lb_web_acl_arn == null ? 0 : 1
+  for_each     = toset(var.lb_web_acl_arn != null ? [""] : [])
   resource_arn = aws_alb.keycloak-load-balancer.arn
   web_acl_arn  = var.lb_web_acl_arn
 }
