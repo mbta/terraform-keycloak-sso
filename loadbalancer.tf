@@ -174,79 +174,14 @@ resource "aws_lb_listener" "keycloak-listener" {
   certificate_arn   = local.certificate_arn
 
   default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.keycloak-target-group.id
+    type = "fixed-response"
+
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Not Found"
+      status_code  = "404"
+    }
   }
 
   tags = var.tags
-}
-
-resource "aws_lb_listener_rule" "forward_admin_from_cidrs" {
-  count        = length(local.admin_cidrs_chunked)
-  listener_arn = aws_lb_listener.keycloak-listener.arn
-  priority     = 50 + count.index
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.keycloak-target-group.id
-  }
-
-  condition {
-    host_header {
-      values = [local.admin_hostname]
-    }
-  }
-  condition {
-    source_ip {
-      values = local.admin_cidrs_chunked[count.index]
-    }
-  }
-}
-
-resource "aws_lb_listener_rule" "redirect_admin_from_other_cidrs" {
-  for_each     = toset(var.admin_cidrs != null ? [""] : [])
-  listener_arn = aws_lb_listener.keycloak-listener.arn
-  priority     = 60
-
-  action {
-    type = "redirect"
-    redirect {
-      host        = "www.mbta.com"
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_302"
-      path        = "/"
-      query       = ""
-    }
-  }
-
-  condition {
-    host_header {
-      values = [local.admin_hostname]
-    }
-  }
-}
-
-resource "aws_lb_listener_rule" "redirect_to_mbta_com" {
-  listener_arn = aws_lb_listener.keycloak-listener.arn
-  priority     = 100
-  action {
-    type = "redirect"
-    redirect {
-      host        = "www.mbta.com"
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
-      path        = "/"
-      query       = ""
-    }
-  }
-  condition {
-    path_pattern {
-      values = ["/"]
-    }
-  }
-
-  tags = merge(var.tags, {
-    Name = "Redirect-to-MBTA-page"
-  })
 }
