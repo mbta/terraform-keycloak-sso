@@ -69,9 +69,8 @@ module "example" {
   aws_region     = local.region
   aws_jms_queues = ""
 
-  db_name               = "keycloak"
-  db_username           = "keycloak"
-  lb_enable_access_logs = false
+  db_name     = "keycloak"
+  db_username = "keycloak"
 
   organization = local.name
   environment  = "test"
