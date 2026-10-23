@@ -178,8 +178,8 @@ resource "aws_lb_listener" "keycloak-listener" {
 
     fixed_response {
       content_type = "text/plain"
-      message_body = "Not Found"
-      status_code  = "404"
+      message_body = "Service Unavailable"
+      status_code  = "503"
     }
   }
 
