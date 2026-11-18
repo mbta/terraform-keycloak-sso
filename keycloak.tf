@@ -102,7 +102,7 @@ resource "aws_ecs_task_definition" "keycloak-ecs-taskdef" {
         {"name":"KC_HTTP_ENABLED", "value":"true"},
         {"name":"KC_LOG_LEVEL", "value":"INFO,cz.integsoft:DEBUG,org.infinispan:DEBUG,org.jgroups:DEBUG"},
         {"name":"KC_HEALTH_ENABLED", "value":"true"},
-        {"name":"JAVA_OPTS_APPEND", "value":"-Xmx${local.keycloak_java_memory}m -DawsRegion=${var.aws_region} -DawsJmsQueues=${var.aws_jms_queues}"},
+        {"name":"JAVA_OPTS_APPEND", "value":"-Xmx${local.keycloak_java_memory}m -DawsRegion=${var.aws_region} -DawsJmsQueues=${var.aws_jms_queues} -XX:-UseBASE64Intrinsics"},
         {"name":"KC_PROXY_HEADERS", "value":"xforwarded"},
         {"name":"KC_SPI_STICKY_SESSION_ENCODER__INFINISPAN__SHOULD_ATTACH_ROUTE", "value": "false"},
         {"name":"QUARKUS_HTTP_ACCESS_LOG_ENABLED", "value":"${var.access_log_enabled}"},
